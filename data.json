@@ -1,0 +1,865 @@
+{
+  "$schema": "https://melvoridle.com/assets/schema/gameData.json",
+  "namespace": "enchanting",
+  "data": {
+    "pages": [
+      {
+        "id": "Enchanting",
+        "media": "assets/enchanting.png",
+        "containerID": "enchanting-container",
+        "headerBgClass": "bg-combat",
+        "hasGameGuide": false,
+        "canBeDefault": true,
+        "customName": "Enchanting",
+        "action": "enchanting:Enchanting",
+        "skillSidebarCategoryID": "Non-Combat",
+        "skills": [
+          "enchanting:Enchanting"
+        ]
+      }
+    ],
+    "items": [
+      {
+        "itemType": "Item",
+        "id": "Common_Essence",
+        "name": "Common Essence",
+        "category": "Enchanting",
+        "type": "Essence",
+        "media": "assets/Common_Essence.png",
+        "ignoreCompletion": false,
+        "obtainFromItemLog": false,
+        "golbinRaidExclusive": false,
+        "sellsFor": 10
+      },
+      {
+        "itemType": "Item",
+        "id": "Uncommon_Essence",
+        "name": "Uncommon Essence",
+        "category": "Enchanting",
+        "type": "Essence",
+        "media": "assets/Uncommon_Essence.png",
+        "ignoreCompletion": false,
+        "obtainFromItemLog": false,
+        "golbinRaidExclusive": false,
+        "sellsFor": 10
+      },
+      {
+        "itemType": "Item",
+        "id": "Rare_Essence",
+        "name": "Rare Essence",
+        "category": "Enchanting",
+        "type": "Essence",
+        "media": "assets/Rare_Essence.png",
+        "ignoreCompletion": false,
+        "obtainFromItemLog": false,
+        "golbinRaidExclusive": false,
+        "sellsFor": 10
+      },
+      {
+        "itemType": "Item",
+        "id": "Epic_Essence",
+        "name": "Epic Essence",
+        "category": "Enchanting",
+        "type": "Essence",
+        "media": "assets/Epic_Essence.png",
+        "ignoreCompletion": false,
+        "obtainFromItemLog": false,
+        "golbinRaidExclusive": false,
+        "sellsFor": 10
+      },
+      {
+        "itemType": "Item",
+        "id": "Legendary_Essence",
+        "name": "Legendary Essence",
+        "category": "Enchanting",
+        "type": "Essence",
+        "media": "assets/Legendary_Essence.png",
+        "ignoreCompletion": false,
+        "obtainFromItemLog": false,
+        "golbinRaidExclusive": false,
+        "sellsFor": 10
+      },
+      {
+        "itemType": "Item",
+        "id": "Mythic_Essence",
+        "name": "Mythic Essence",
+        "category": "Enchanting",
+        "type": "Essence",
+        "media": "assets/Mythic_Essence.png",
+        "ignoreCompletion": false,
+        "obtainFromItemLog": false,
+        "golbinRaidExclusive": false,
+        "sellsFor": 10
+      }
+    ],
+    "itemUpgrades": [
+      {
+        "upgradedItemID": "enchanting:Uncommon_Essence",
+        "gpCost": 0,
+        "scCost": 0,
+        "itemCosts": [
+          {
+            "id": "enchanting:Common_Essence",
+            "quantity": 100
+          }
+        ],
+        "rootItemIDs": [
+          "enchanting:Common_Essence"
+        ],
+        "isDowngrade": false
+      },
+      {
+        "upgradedItemID": "enchanting:Rare_Essence",
+        "gpCost": 0,
+        "scCost": 0,
+        "itemCosts": [
+          {
+            "id": "enchanting:Uncommon_Essence",
+            "quantity": 100
+          }
+        ],
+        "rootItemIDs": [
+          "enchanting:Uncommon_Essence"
+        ],
+        "isDowngrade": false
+      },
+      {
+        "upgradedItemID": "enchanting:Epic_Essence",
+        "gpCost": 0,
+        "scCost": 0,
+        "itemCosts": [
+          {
+            "id": "enchanting:Rare_Essence",
+            "quantity": 50
+          }
+        ],
+        "rootItemIDs": [
+          "enchanting:Rare_Essence"
+        ],
+        "isDowngrade": false
+      },
+      {
+        "upgradedItemID": "enchanting:Legendary_Essence",
+        "gpCost": 0,
+        "scCost": 0,
+        "itemCosts": [
+          {
+            "id": "enchanting:Epic_Essence",
+            "quantity": 50
+          }
+        ],
+        "rootItemIDs": [
+          "enchanting:Epic_Essence"
+        ],
+        "isDowngrade": false
+      },
+      {
+        "upgradedItemID": "enchanting:Mythic_Essence",
+        "gpCost": 0,
+        "scCost": 0,
+        "itemCosts": [
+          {
+            "id": "enchanting:Legendary_Essence",
+            "quantity": 25
+          }
+        ],
+        "rootItemIDs": [
+          "enchanting:Legendary_Essence"
+        ],
+        "isDowngrade": false
+      }
+    ],
+    "skillData": [
+      {
+        "skillID": "enchanting:Enchanting",
+        "data": {
+          "actions": [
+            {
+              "id": "Enchant",
+              "name": "Enchant",
+              "actionText": "Increase rarity to",
+              "media": "assets/enchanting.png",
+              "baseInterval": 10000,
+              "baseXP": 10
+            },
+            {
+              "id": "Disenchant",
+              "name": "Disenchant",
+              "actionText": "Disenchant into",
+              "media": "assets/disenchant.png",
+              "baseInterval": 500,
+              "baseXP": 5
+            },
+            {
+              "id": "Reroll",
+              "name": "Reroll",
+              "actionText": "Reroll modifier of",
+              "media": "assets/reroll.png",
+              "baseInterval": -1,
+              "baseXP": 0
+            }
+          ],
+          "mods": [
+            {
+              "id": "increasedGlobalAccuracy",
+              "level": 1,
+              "tags": [],
+              "quality": 1,
+              "value": [
+                1,
+                2,
+                3,
+                4,
+                5
+              ]
+            },
+            {
+              "id": "increasedMaxHitPercent",
+              "level": 1,
+              "tags": [],
+              "quality": 1,
+              "value": [
+                1,
+                2,
+                3,
+                4,
+                5
+              ]
+            },
+            {
+              "id": "increasedGlobalEvasion",
+              "level": 1,
+              "tags": [
+                "armour"
+              ],
+              "quality": 1,
+              "value": [
+                1,
+                2,
+                3,
+                4,
+                5
+              ]
+            },
+            {
+              "id": "increasedMeleeAccuracyBonus",
+              "level": 1,
+              "tags": [
+                "melee"
+              ],
+              "quality": 1,
+              "value": [
+                2,
+                4,
+                6,
+                8,
+                10
+              ]
+            },
+            {
+              "id": "increasedMeleeMaxHit",
+              "level": 1,
+              "tags": [
+                "melee"
+              ],
+              "quality": 1,
+              "value": [
+                2,
+                4,
+                6,
+                8,
+                10
+              ]
+            },
+            {
+              "id": "increasedMeleeEvasion",
+              "level": 1,
+              "tags": [
+                "melee",
+                "armour"
+              ],
+              "quality": 1,
+              "value": [
+                2,
+                4,
+                6,
+                8,
+                10
+              ]
+            },
+            {
+              "id": "increasedRangedAccuracyBonus",
+              "level": 1,
+              "tags": [
+                "ranged"
+              ],
+              "quality": 1,
+              "value": [
+                2,
+                4,
+                6,
+                8,
+                10
+              ]
+            },
+            {
+              "id": "increasedRangedMaxHit",
+              "level": 1,
+              "tags": [
+                "ranged"
+              ],
+              "quality": 1,
+              "value": [
+                2,
+                4,
+                6,
+                8,
+                10
+              ]
+            },
+            {
+              "id": "increasedRangedEvasion",
+              "level": 1,
+              "tags": [
+                "ranged",
+                "armour"
+              ],
+              "quality": 1,
+              "value": [
+                2,
+                4,
+                6,
+                8,
+                10
+              ]
+            },
+            {
+              "id": "increasedMagicAccuracyBonus",
+              "level": 1,
+              "tags": [
+                "magic"
+              ],
+              "quality": 1,
+              "value": [
+                2,
+                4,
+                6,
+                8,
+                10
+              ]
+            },
+            {
+              "id": "increasedMagicMaxHit",
+              "level": 1,
+              "tags": [
+                "magic"
+              ],
+              "quality": 1,
+              "value": [
+                2,
+                4,
+                6,
+                8,
+                10
+              ]
+            },
+            {
+              "id": "increasedMagicEvasion",
+              "level": 1,
+              "tags": [
+                "magic",
+                "armour"
+              ],
+              "quality": 1,
+              "value": [
+                2,
+                4,
+                6,
+                8,
+                10
+              ]
+            },
+            {
+              "id": "decreasedAttackIntervalPercent",
+              "level": 1,
+              "tags": [
+                "weapon"
+              ],
+              "quality": 1,
+              "value": [
+                5,
+                5,
+                10,
+                10,
+                15
+              ]
+            },
+            {
+              "id": "increasedMaxHitpoints",
+              "level": 1,
+              "tags": [
+                "armour"
+              ],
+              "quality": 1,
+              "value": [
+                1,
+                2,
+                3,
+                4,
+                5
+              ]
+            },
+            {
+              "id": "increasedMinHitBasedOnMaxHit",
+              "level": 1,
+              "tags": [],
+              "quality": 1,
+              "value": [
+                1,
+                2,
+                3,
+                4,
+                5
+              ]
+            },
+            {
+              "id": "increasedLifesteal",
+              "level": 1,
+              "tags": [],
+              "quality": 2,
+              "value": [
+                2,
+                3,
+                4,
+                5
+              ]
+            },
+            {
+              "id": "increasedMeleeLifesteal",
+              "level": 1,
+              "tags": [
+                "melee"
+              ],
+              "quality": 2,
+              "value": [
+                4,
+                6,
+                8,
+                10
+              ]
+            },
+            {
+              "id": "increasedRangedLifesteal",
+              "level": 1,
+              "tags": [
+                "ranged"
+              ],
+              "quality": 2,
+              "value": [
+                4,
+                6,
+                8,
+                10
+              ]
+            },
+            {
+              "id": "increasedMagicLifesteal",
+              "level": 1,
+              "tags": [
+                "magic"
+              ],
+              "quality": 2,
+              "value": [
+                4,
+                6,
+                8,
+                10
+              ]
+            },
+            {
+              "id": "increasedMeleeCritChance",
+              "level": 1,
+              "tags": [
+                "melee"
+              ],
+              "quality": 2,
+              "value": [
+                2,
+                3,
+                4,
+                5
+              ]
+            },
+            {
+              "id": "increasedRangedCritChance",
+              "level": 1,
+              "tags": [
+                "ranged"
+              ],
+              "quality": 2,
+              "value": [
+                2,
+                3,
+                4,
+                5
+              ]
+            },
+            {
+              "id": "increasedMagicCritChance",
+              "level": 1,
+              "tags": [
+                "magic"
+              ],
+              "quality": 2,
+              "value": [
+                2,
+                3,
+                4,
+                5
+              ]
+            },
+            {
+              "id": "increasedChanceToApplyPoison",
+              "level": 1,
+              "tags": [],
+              "quality": 3,
+              "value": [
+                3,
+                4,
+                5
+              ]
+            },
+            {
+              "id": "increasedChanceToApplyDeadlyPoison",
+              "level": 1,
+              "tags": [],
+              "quality": 3,
+              "value": [
+                3,
+                4,
+                5
+              ]
+            },
+            {
+              "id": "increasedChanceToApplyFrostburn",
+              "level": 1,
+              "tags": [],
+              "quality": 3,
+              "value": [
+                3,
+                4,
+                5
+              ]
+            },
+            {
+              "id": "increasedChanceToApplyBurn",
+              "level": 1,
+              "tags": [],
+              "quality": 3,
+              "value": [
+                3,
+                4,
+                5
+              ]
+            },
+            {
+              "id": "increasedChanceToApplyShock",
+              "level": 1,
+              "tags": [],
+              "quality": 3,
+              "value": [
+                3,
+                4,
+                5
+              ]
+            },
+            {
+              "id": "increasedAttackRolls",
+              "level": 1,
+              "tags": [
+                "weapon"
+              ],
+              "quality": 4,
+              "value": [
+                1,
+                1
+              ]
+            },
+            {
+              "id": "increasedDamageReductionPercent",
+              "level": 1,
+              "tags": [
+                "armour"
+              ],
+              "quality": 4,
+              "value": [
+                1,
+                2
+              ]
+            }
+          ],
+          "specials": [
+            {
+              "id": "StoneBarrier",
+              "level": 1,
+              "tags": [],
+              "quality": 2,
+              "specialAttacks": [
+                "melvorD:StoneBarrier",
+                "melvorD:StoneBarrier",
+                "melvorD:StoneBarrier",
+                "melvorD:StoneBarrier"
+              ],
+              "chance": [
+                10,
+                15,
+                20,
+                25
+              ]
+            },
+            {
+              "id": "Heal",
+              "level": 1,
+              "tags": [],
+              "quality": 3,
+              "specialAttacks": [
+                "melvorD:Heal",
+                "melvorD:Heal",
+                "melvorD:Heal"
+              ],
+              "chance": [
+                5,
+                10,
+                15
+              ]
+            },
+            {
+              "id": "BruteForce",
+              "level": 1,
+              "tags": [],
+              "quality": 2,
+              "specialAttacks": [
+                "melvorD:BruteForce",
+                "melvorD:BruteForce",
+                "melvorD:BruteForce",
+                "melvorD:BruteForce"
+              ],
+              "chance": [
+                10,
+                15,
+                20,
+                25
+              ]
+            },
+            {
+              "id": "LifeLeech",
+              "level": 1,
+              "tags": [],
+              "quality": 2,
+              "specialAttacks": [
+                "melvorD:LifeLeech",
+                "melvorD:LifeLeech",
+                "melvorD:LifeLeech",
+                "melvorD:LifeLeech"
+              ],
+              "chance": [
+                10,
+                15,
+                20,
+                25
+              ]
+            },
+            {
+              "id": "Onslaught",
+              "level": 1,
+              "tags": [],
+              "quality": 2,
+              "specialAttacks": [
+                "melvorD:Onslaught",
+                "melvorD:Onslaught",
+                "melvorD:Onslaught",
+                "melvorD:Onslaught"
+              ],
+              "chance": [
+                20,
+                30,
+                40,
+                50
+              ]
+            },
+            {
+              "id": "SwiftAttack",
+              "level": 1,
+              "tags": [],
+              "quality": 2,
+              "specialAttacks": [
+                "melvorF:SwiftAttack",
+                "melvorF:SwiftAttack",
+                "melvorF:SwiftAttack",
+                "melvorF:SwiftAttack"
+              ],
+              "chance": [
+                20,
+                30,
+                40,
+                50
+              ]
+            },
+            {
+              "id": "PoisonedHit",
+              "level": 1,
+              "tags": [],
+              "quality": 2,
+              "specialAttacks": [
+                "melvorF:PoisonedHit",
+                "melvorF:PoisonedHit",
+                "melvorF:PoisonedHit",
+                "melvorF:PoisonedHit"
+              ],
+              "chance": [
+                20,
+                30,
+                40,
+                50
+              ]
+            },
+            {
+              "id": "FrozenShot",
+              "level": 1,
+              "tags": [
+                "ranged"
+              ],
+              "quality": 2,
+              "specialAttacks": [
+                "melvorD:FrozenShot",
+                "melvorD:FrozenShot",
+                "melvorD:FrozenShot",
+                "melvorD:FrozenShot"
+              ],
+              "chance": [
+                15,
+                20,
+                25,
+                30
+              ]
+            },
+            {
+              "id": "Volley",
+              "level": 1,
+              "tags": [
+                "ranged"
+              ],
+              "quality": 2,
+              "specialAttacks": [
+                "melvorD:Volley",
+                "melvorD:Volley",
+                "melvorD:Volley",
+                "melvorD:Volley"
+              ],
+              "chance": [
+                20,
+                30,
+                40,
+                50
+              ]
+            },
+            {
+              "id": "OnTheHunt",
+              "level": 1,
+              "tags": [
+                "ranged"
+              ],
+              "quality": 2,
+              "specialAttacks": [
+                "melvorD:OnTheHunt",
+                "melvorD:OnTheHunt",
+                "melvorD:OnTheHunt",
+                "melvorD:OnTheHunt"
+              ],
+              "chance": [
+                30,
+                40,
+                50,
+                60
+              ]
+            },
+            {
+              "id": "PiercingArrow",
+              "level": 1,
+              "tags": [
+                "ranged"
+              ],
+              "quality": 3,
+              "specialAttacks": [
+                "melvorD:PiercingArrow",
+                "melvorD:PiercingArrow",
+                "melvorD:PiercingArrow"
+              ],
+              "chance": [
+                5,
+                10,
+                15
+              ]
+            },
+            {
+              "id": "TripleDamage",
+              "level": 1,
+              "tags": [],
+              "quality": 3,
+              "specialAttacks": [
+                "melvorD:TripleDamage",
+                "melvorD:TripleDamage",
+                "melvorD:TripleDamage"
+              ],
+              "chance": [
+                5,
+                15,
+                25
+              ]
+            },
+            {
+              "id": "Firebreathing",
+              "level": 1,
+              "tags": [
+                "magic"
+              ],
+              "quality": 3,
+              "specialAttacks": [
+                "melvorD:Firebreathing",
+                "melvorD:Firebreathing",
+                "melvorD:Firebreathing",
+                "melvorD:Firebreathing"
+              ],
+              "chance": [
+                15,
+                20,
+                25,
+                30
+              ]
+            },
+            {
+              "id": "DrowsySpores",
+              "level": 1,
+              "tags": [
+                "magic"
+              ],
+              "quality": 3,
+              "specialAttacks": [
+                "melvorF:DrowsySpores",
+                "melvorF:DrowsySpores",
+                "melvorF:DrowsySpores",
+                "melvorF:DrowsySpores"
+              ],
+              "chance": [
+                15,
+                20,
+                25,
+                30
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

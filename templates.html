@@ -1,0 +1,49 @@
+<template id="enchanting-page-component">
+  <div class="content d-none" id="enchanting-container">
+    <div class="skill-info">
+      <div class="block block-rounded mb-2" id="skill-header-enchanting:Enchanting">
+        <div class="progress active mb-1 border border-top border-1x border-dark" style="height: 8px">
+          <div class="progress-bar bg-info" id="skill-progress-bar-enchanting:Enchanting" role="progressbar"
+            style="width: 0%;"></div>
+        </div>
+        <div class="block-header text-center pt-0 pb-0">
+          <ul class="nav-main nav-main-horizontal nav-main-horizontal-override font-size-xs w-100">
+            <li class="m-1" style="min-width: 45%;">
+              <span class="font-w600">
+                <lang-string lang-id="MENU_TEXT_SKILL_LEVEL"></lang-string>
+              </span>
+              <span class="p-1 bg-success rounded font-w600" id="skill-progress-level-enchanting:Enchanting">1 / 99</span>
+            </li>
+            <li class="m-1" style="min-width: 45%">
+              <span class="font-w600">
+                <lang-string lang-id="MENU_TEXT_SKILL XP"></lang-string>
+              </span>
+              <span class="p-1 bg-info rounded font-w600" id="skill-progress-xp-enchanting:Enchanting">1 / 99</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="row row-deck gutters-tiny">
+      <div class="col-12">
+        <div id="page" class="block block-rounded border-top border-success border-4x p-3">
+          <div class="row no-gutters">
+            <div class="col-12 col-md-4" id="enchanting-menu-container"></div>
+            <div class="col-12 col-md-8">
+              <div class="block-content block-content-full">
+                <div class="row no-gutters" id="enchanting-item-selector-container"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="reroll-radio-template">
+  <div class="custom-control custom-radio mb-1 mx-2">
+    <input class="custom-control-input pointer-enabled" type="radio" id="input">
+    <label class="custom-control-label pointer-enabled font-w400" id="label"></label>
+  </div>
+</template>

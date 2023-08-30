@@ -1,0 +1,4 @@
+{
+  "namespace": "enchanting",
+  "setup": "setup.mjs"
+}
