@@ -100,7 +100,7 @@
         "itemCosts": [
           {
             "id": "enchanting:Common_Essence",
-            "quantity": 100
+            "quantity": 50
           }
         ],
         "rootItemIDs": [
@@ -115,7 +115,7 @@
         "itemCosts": [
           {
             "id": "enchanting:Uncommon_Essence",
-            "quantity": 100
+            "quantity": 25
           }
         ],
         "rootItemIDs": [
@@ -130,7 +130,7 @@
         "itemCosts": [
           {
             "id": "enchanting:Rare_Essence",
-            "quantity": 50
+            "quantity": 20
           }
         ],
         "rootItemIDs": [
@@ -145,7 +145,7 @@
         "itemCosts": [
           {
             "id": "enchanting:Epic_Essence",
-            "quantity": 50
+            "quantity": 15
           }
         ],
         "rootItemIDs": [
@@ -160,7 +160,7 @@
         "itemCosts": [
           {
             "id": "enchanting:Legendary_Essence",
-            "quantity": 25
+            "quantity": 10
           }
         ],
         "rootItemIDs": [

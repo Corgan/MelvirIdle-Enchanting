@@ -241,7 +241,7 @@ class RerollBox extends ContainedComponent {
     updateMod(item, mod, index) {
         if(mod !== undefined) {
             let mods = {};
-            mods[mod._localID] = mod.value[item.quality - mod.quality];
+            mods[mod._localID] = mod.value[Math.max(0, item.quality - mod.quality)];
             let modSpan = `<small>${getModifierDataSpans(mods)[0]}</small>`;
 
 
@@ -810,7 +810,7 @@ class EnchantingEquipmentItem extends EquipmentItem {
                 description += '<br>';
             let extraModifiers = {};
             this.extraModifiers.forEach(mod => {
-                extraModifiers[mod._localID] = mod.value[this.quality - mod.quality];
+                extraModifiers[mod._localID] = mod.value[Math.max(0, this.quality - mod.quality)];
             });
             description += describeModifierDataLineBreak(extraModifiers);
         }
@@ -825,7 +825,7 @@ class EnchantingEquipmentItem extends EquipmentItem {
             if(modifiers === undefined)
                 modifiers = {};
             this.extraModifiers.forEach(mod => {
-                modifiers[mod._localID] = (modifiers[mod._localID] !== undefined ? modifiers[mod._localID] : 0) + mod.value[this.quality - mod.quality];
+                modifiers[mod._localID] = (modifiers[mod._localID] !== undefined ? modifiers[mod._localID] : 0) + mod.value[Math.max(0, this.quality - mod.quality)];
             });
         }
         return modifiers;
@@ -1019,7 +1019,7 @@ class EnchantingWeaponItem extends WeaponItem {
                 description += '<br>';
             let extraModifiers = {};
             this.extraModifiers.forEach(mod => {
-                extraModifiers[mod._localID] = mod.value[this.quality - mod.quality];
+                extraModifiers[mod._localID] = mod.value[Math.max(0, this.quality - mod.quality)];
             });
             description += describeModifierDataLineBreak(extraModifiers);
         }
@@ -1034,7 +1034,7 @@ class EnchantingWeaponItem extends WeaponItem {
             if(modifiers === undefined)
                 modifiers = {};
             this.extraModifiers.forEach(mod => {
-                modifiers[mod._localID] = (modifiers[mod._localID] !== undefined ? modifiers[mod._localID] : 0) + mod.value[this.quality - mod.quality];
+                modifiers[mod._localID] = (modifiers[mod._localID] !== undefined ? modifiers[mod._localID] : 0) + mod.value[Math.max(0, this.quality - mod.quality)];
             });
         }
         return modifiers;
@@ -1051,7 +1051,7 @@ class EnchantingWeaponItem extends WeaponItem {
     get specialAttacks() {
         let specials = [...this.item.specialAttacks];
         if(this.extraSpecials.size > 0) {
-            let extraSpecials = [...this.extraSpecials].map(special => special.specialAttacks[this.quality - special.quality]);
+            let extraSpecials = [...this.extraSpecials].map(special => special.specialAttacks[Math.max(0, this.quality - special.quality)]);
             specials = specials.concat(extraSpecials);
         }
         return specials;
@@ -1071,7 +1071,7 @@ class EnchantingWeaponItem extends WeaponItem {
             });
 
             let extraChances = [...this.extraSpecials].map(special => {
-                return special.chance[this.quality - special.quality];
+                return special.chance[Math.max(0, this.quality - special.quality)];
             });
 
             //let totalDefault = defaultChances.reduce((sum, val) => sum + val, 0);
@@ -1249,7 +1249,7 @@ class EnchantingUpgradedEquipmentItemWrapper extends EquipmentItem {
                 description += '<br>';
             let extraModifiers = {};
             this.item.extraModifiers.forEach(mod => {
-                extraModifiers[mod._localID] = mod.value[this.quality - mod.quality];
+                extraModifiers[mod._localID] = mod.value[Math.max(0, this.item.quality - mod.quality)];
             });
             description += describeModifierDataLineBreak(extraModifiers);
         }
@@ -1264,7 +1264,7 @@ class EnchantingUpgradedEquipmentItemWrapper extends EquipmentItem {
             if(modifiers === undefined)
                 modifiers = {};
             this.item.extraModifiers.forEach(mod => {
-                modifiers[mod._localID] = (modifiers[mod._localID] !== undefined ? modifiers[mod._localID] : 0) + mod.value[this.item.quality - mod.quality];
+                modifiers[mod._localID] = (modifiers[mod._localID] !== undefined ? modifiers[mod._localID] : 0) + mod.value[Math.max(0, this.item.quality - mod.quality)];
             });
         }
         return modifiers;
@@ -1430,7 +1430,7 @@ class EnchantingUpgradedWeaponItemWrapper extends WeaponItem {
                 description += '<br>';
             let extraModifiers = {};
             this.item.extraModifiers.forEach(mod => {
-                extraModifiers[mod._localID] = mod.value[this.quality - mod.quality];
+                extraModifiers[mod._localID] = mod.value[Math.max(0, this.item.quality - mod.quality)];
             });
             description += describeModifierDataLineBreak(extraModifiers);
         }
@@ -1445,7 +1445,7 @@ class EnchantingUpgradedWeaponItemWrapper extends WeaponItem {
             if(modifiers === undefined)
                 modifiers = {};
             this.item.extraModifiers.forEach(mod => {
-                modifiers[mod._localID] = (modifiers[mod._localID] !== undefined ? modifiers[mod._localID] : 0) + mod.value[this.item.quality - mod.quality];
+                modifiers[mod._localID] = (modifiers[mod._localID] !== undefined ? modifiers[mod._localID] : 0) + mod.value[Math.max(0, this.item.quality - mod.quality)];
             });
         }
         return modifiers;
@@ -1462,7 +1462,7 @@ class EnchantingUpgradedWeaponItemWrapper extends WeaponItem {
     get specialAttacks() {
         let specials = [...this.upgradedItem.specialAttacks];
         if(this.extraSpecials.size > 0) {
-            let extraSpecials = [...this.item.extraSpecials].map(special => special.specialAttacks[this.item.quality - special.quality]);
+            let extraSpecials = [...this.item.extraSpecials].map(special => special.specialAttacks[Math.max(0, this.item.quality - special.quality)]);
             specials = specials.concat(extraSpecials);
         }
         return specials;
@@ -1482,7 +1482,7 @@ class EnchantingUpgradedWeaponItemWrapper extends WeaponItem {
             });
 
             let extraChances = [...this.item.extraSpecials].map(special => {
-                return special.chance[this.item.quality - special.quality];
+                return special.chance[Math.max(0, this.item.quality - special.quality)];
             });
 
             overrideSpecialChances = [...defaultChances, ...extraChances];
@@ -1935,7 +1935,8 @@ class Enchanting extends Skill {
         let qualityModifier = quality + 1;
         if(quality === 0 && item.quality !== undefined)
             qualityModifier = item.quality + 1;
-        let xp = this.currentAction.baseXP * qualityModifier;
+        let itemLevelModifier = this.getItemLevelMultiplier(item);
+        let xp = this.currentAction.baseXP * qualityModifier * itemLevelModifier;
         if(isAuto && action === this.actions.getObjectByID('enchanting:Disenchant'))
             xp /= 2;
         return xp;
@@ -2071,21 +2072,21 @@ class Enchanting extends Skill {
             costs.addItem(item, 1);
             if(item.item !== undefined && item.quality !== undefined) {
                 if(item.quality === 4) {
-                    costs.addItem(game.items.getObjectByID('enchanting:Legendary_Essence'), 10);
-                    costs.addItem(game.items.getObjectByID('enchanting:Mythic_Essence'), 5);
+                    costs.addItem(game.items.getObjectByID('enchanting:Legendary_Essence'), 10 * this.getItemLevelMultiplier(item));
+                    costs.addItem(game.items.getObjectByID('enchanting:Mythic_Essence'), 5 * this.getItemLevelMultiplier(item));
                 } else if (item.quality === 3) {
-                    costs.addItem(game.items.getObjectByID('enchanting:Epic_Essence'), 15);
-                    costs.addItem(game.items.getObjectByID('enchanting:Legendary_Essence'), 10);
+                    costs.addItem(game.items.getObjectByID('enchanting:Epic_Essence'), 15 * this.getItemLevelMultiplier(item));
+                    costs.addItem(game.items.getObjectByID('enchanting:Legendary_Essence'), 10 * this.getItemLevelMultiplier(item));
                 } else if (item.quality === 2) {
-                    costs.addItem(game.items.getObjectByID('enchanting:Rare_Essence'), 20);
-                    costs.addItem(game.items.getObjectByID('enchanting:Epic_Essence'), 15);
+                    costs.addItem(game.items.getObjectByID('enchanting:Rare_Essence'), 20 * this.getItemLevelMultiplier(item));
+                    costs.addItem(game.items.getObjectByID('enchanting:Epic_Essence'), 15 * this.getItemLevelMultiplier(item));
                 } else if (item.quality === 1) {
-                    costs.addItem(game.items.getObjectByID('enchanting:Uncommon_Essence'), 25);
-                    costs.addItem(game.items.getObjectByID('enchanting:Rare_Essence'), 20);
+                    costs.addItem(game.items.getObjectByID('enchanting:Uncommon_Essence'), 25 * this.getItemLevelMultiplier(item));
+                    costs.addItem(game.items.getObjectByID('enchanting:Rare_Essence'), 20 * this.getItemLevelMultiplier(item));
                 }
             } else {
-                costs.addItem(game.items.getObjectByID('enchanting:Common_Essence'), 50);
-                costs.addItem(game.items.getObjectByID('enchanting:Uncommon_Essence'), 25);
+                costs.addItem(game.items.getObjectByID('enchanting:Common_Essence'), 50 * this.getItemLevelMultiplier(item));
+                costs.addItem(game.items.getObjectByID('enchanting:Uncommon_Essence'), 25 * this.getItemLevelMultiplier(item));
             }
         }
 
@@ -2096,19 +2097,71 @@ class Enchanting extends Skill {
         const costs = new Costs(this.game);
         if(item !== undefined && item.item !== undefined) {
             if(item.quality === 5) {
-                costs.addItem(game.items.getObjectByID('enchanting:Mythic_Essence'), 1);
+                costs.addItem(game.items.getObjectByID('enchanting:Mythic_Essence'), 1 * this.getItemLevelMultiplier(item));
             } else if(item.quality === 4) {
-                costs.addItem(game.items.getObjectByID('enchanting:Legendary_Essence'), 2);
+                costs.addItem(game.items.getObjectByID('enchanting:Legendary_Essence'), 2 * this.getItemLevelMultiplier(item));
             } else if (item.quality === 3) {
-                costs.addItem(game.items.getObjectByID('enchanting:Epic_Essence'), 5);
+                costs.addItem(game.items.getObjectByID('enchanting:Epic_Essence'), 5 * this.getItemLevelMultiplier(item));
             } else if (item.quality === 2) {
-                costs.addItem(game.items.getObjectByID('enchanting:Rare_Essence'), 10);
+                costs.addItem(game.items.getObjectByID('enchanting:Rare_Essence'), 10 * this.getItemLevelMultiplier(item));
             } else if (item.quality === 1) {
-                costs.addItem(game.items.getObjectByID('enchanting:Uncommon_Essence'), 25);
+                costs.addItem(game.items.getObjectByID('enchanting:Uncommon_Essence'), 25 * this.getItemLevelMultiplier(item));
             }
         }
 
         return costs;
+    }
+
+    getItemLevel(item) {
+        let level = 1;
+        if(this.isAugmentedItem(item))
+            item = item.item;
+
+        if(item.constructor === EquipmentItem || item.constructor === WeaponItem) {
+            level = item.equipRequirements.reduce((highest, current) => {
+                return current.type === "SkillLevel" && current.level > highest ? current.level : highest;
+            }, 1);
+
+            if(level === 1 && (item.type === "Ring" || item.type === "Amulet")) {
+                let action = game.crafting.actions.find(action => action.product === item);
+                if(action !== undefined)
+                    level = action.level;
+            }
+
+            if(level === 1 && item.equipRequirements.filter(req => req.type === 'SkillLevel' && req.skill !== game.altMagic).length === 0) {
+                if(item.sellsFor >= 150)
+                    level = 10;
+                if(item.sellsFor >= 10000)
+                    level = 25;
+                if(item.sellsFor >= 10000)
+                    level = 40;
+                if(item.sellsFor >= 20000)
+                    level = 60;
+                if(item.sellsFor >= 100000)
+                    level = 70;
+                if(item.sellsFor >= 300000)
+                    level = 85;
+                if(item.sellsFor >= 1000000)
+                    level = 99;
+            }
+        }
+        return level;
+    }
+
+    getItemLevelMultiplier(item) {
+        let multiplier = 1;
+        let itemLevel = this.getItemLevel(item);
+        if(itemLevel >= 20)
+            multiplier = 2;
+        if(itemLevel >= 40)
+            multiplier = 3;
+        if(itemLevel >= 60)
+            multiplier = 4;
+        if(itemLevel >= 80)
+            multiplier = 5;
+        if(itemLevel >= 90)
+            multiplier = 6;
+        return multiplier;
     }
 
     getEssenceForItem(item, quality) {
@@ -2134,7 +2187,7 @@ class Enchanting extends Skill {
                 essence = game.items.getObjectByID('enchanting:Common_Essence');
                 break;
         }
-        return [ essence, 1 ];
+        return [ essence, this.getItemLevelMultiplier(item) ];
     }
 
     giveAutoDisenchantRewards(item, quality) {
