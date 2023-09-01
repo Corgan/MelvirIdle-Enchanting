@@ -1,9 +1,9 @@
 :root {
   --mythic: #E6CC80;
   --legendary: #FF8000;
-  --epic: #A335EE;
-  --rare: #0070FF;
-  --uncommon: #1EFF0C;
+  --epic: #C060FF;
+  --rare: #2585FF;
+  --uncommon: #3AD72D;
   --common: #889D9D;
   --bg: transparent;
 }
@@ -36,4 +36,24 @@ img[src*="q=1"] {
   border-radius: 5px;
   position: relative;
   background: radial-gradient(var(--uncommon) 0%, var(--bg) 70%);
+}
+
+.text-enchanting-quality-1 {
+  color: var(--uncommon);
+}
+
+.text-enchanting-quality-2 {
+  color: var(--rare);
+}
+
+.text-enchanting-quality-3 {
+  color: var(--epic);
+}
+
+.text-enchanting-quality-4 {
+  color: var(--legendary);
+}
+
+.text-enchanting-quality-5 {
+  color: var(--mythic);
 }

@@ -242,7 +242,13 @@ class RerollBox extends ContainedComponent {
         if(mod !== undefined) {
             let mods = {};
             mods[mod._localID] = mod.value[Math.max(0, item.quality - mod.quality)];
-            let modSpan = `<small>${getModifierDataSpans(mods)[0]}</small>`;
+            
+            let modifierSpans = formatModifiers((desc,textClass)=>{
+                textClass = `text-enchanting-quality-${item.quality}`;
+                return `<span class="${textClass}">${desc}</span>`;
+            }, mods, 1, 1);
+
+            let modSpan = `<small>${modifierSpans[0]}</small>`;
 
 
             if(this.rerollRadioGroup[index] === undefined) {
@@ -812,7 +818,11 @@ class EnchantingEquipmentItem extends EquipmentItem {
             this.extraModifiers.forEach(mod => {
                 extraModifiers[mod._localID] = mod.value[Math.max(0, this.quality - mod.quality)];
             });
-            description += describeModifierDataLineBreak(extraModifiers);
+            let modifierSpans = formatModifiers((desc,textClass)=>{
+                textClass = `text-enchanting-quality-${this.quality}`;
+                return `<span class="${textClass}">${desc}</span>`;
+            }, extraModifiers, 1, 1);
+            description += joinAsLineBreakList(modifierSpans);
         }
         return description;
     }
@@ -1021,7 +1031,11 @@ class EnchantingWeaponItem extends WeaponItem {
             this.extraModifiers.forEach(mod => {
                 extraModifiers[mod._localID] = mod.value[Math.max(0, this.quality - mod.quality)];
             });
-            description += describeModifierDataLineBreak(extraModifiers);
+            let modifierSpans = formatModifiers((desc,textClass)=>{
+                textClass = `text-enchanting-quality-${this.quality}`;
+                return `<span class="${textClass}">${desc}</span>`;
+            }, extraModifiers, 1, 1);
+            description += joinAsLineBreakList(modifierSpans);
         }
         return description;
     }
@@ -1251,7 +1265,11 @@ class EnchantingUpgradedEquipmentItemWrapper extends EquipmentItem {
             this.item.extraModifiers.forEach(mod => {
                 extraModifiers[mod._localID] = mod.value[Math.max(0, this.item.quality - mod.quality)];
             });
-            description += describeModifierDataLineBreak(extraModifiers);
+            let modifierSpans = formatModifiers((desc,textClass)=>{
+                textClass = `text-enchanting-quality-${this.quality}`;
+                return `<span class="${textClass}">${desc}</span>`;
+            }, extraModifiers, 1, 1);
+            description += joinAsLineBreakList(modifierSpans);
         }
         return description;
     }
@@ -1432,7 +1450,11 @@ class EnchantingUpgradedWeaponItemWrapper extends WeaponItem {
             this.item.extraModifiers.forEach(mod => {
                 extraModifiers[mod._localID] = mod.value[Math.max(0, this.item.quality - mod.quality)];
             });
-            description += describeModifierDataLineBreak(extraModifiers);
+            let modifierSpans = formatModifiers((desc,textClass)=>{
+                textClass = `text-enchanting-quality-${this.quality}`;
+                return `<span class="${textClass}">${desc}</span>`;
+            }, extraModifiers, 1, 1);
+            description += joinAsLineBreakList(modifierSpans);
         }
         return description;
     }
