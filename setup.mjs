@@ -13,6 +13,31 @@ export async function setup({ characterStorage, gameData, patch, loadTemplates, 
 
         window.selectFromWeightedArray = selectFromWeightedArray;
     }
+    if(window.formatModifiers === undefined) {
+        function formatModifiers(formatter, modifiers, negMult=1, posMult=1) {
+            const descriptions = [];
+            Object.entries(modifiers).forEach((entry)=>{
+                const isNeg = modifierData[entry[0]].isNegative;
+                const mult = isNeg ? negMult : posMult;
+                if (isSkillEntry(entry)) {
+                    entry[1].forEach((data)=>{
+                        const modifiedData = Object.assign(Object.assign({}, data), {
+                            value: data.value * mult
+                        });
+                        const [desc,textClass] = printPlayerModifier(entry[0], modifiedData);
+                        descriptions.push(formatter(desc, textClass));
+                    }
+                    );
+                } else {
+                    const [desc,textClass] = printPlayerModifier(entry[0], entry[1] * mult);
+                    descriptions.push(formatter(desc, textClass));
+                }
+            }
+            );
+            return descriptions;
+        }
+        window.formatModifiers = formatModifiers;
+    }
 
     console.log("Loading Enchanting Templates");
     await loadTemplates("templates.html"); // Add templates
