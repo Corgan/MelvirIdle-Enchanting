@@ -1539,11 +1539,17 @@ class EnchantingItemUpgrade {
         });
         this.gpCost = itemUpgrade.gpCost;
         this.scCost = itemUpgrade.scCost;
-        this.rootItems = itemUpgrade.rootItems.map(root => {
-            if(itemToUpgrade.item === root)
-                return itemToUpgrade;
-            return root;
+        this.rootItems = [];
+        
+        itemUpgrade.rootItems.forEach(root => {
+            if(itemToUpgrade.item === root) {
+                this.rootItems.push(itemToUpgrade);
+            } else {
+                if(!game.enchanting.isAugmentedItem(root))
+                    this.rootItems.push(root);
+            }
         });
+        
         if(itemUpgrade.upgradedItem instanceof WeaponItem) {
             this.upgradedItem = new EnchantingUpgradedWeaponItemWrapper(itemToUpgrade, itemUpgrade.upgradedItem);
         } else if (itemUpgrade.upgradedItem instanceof EquipmentItem) {
