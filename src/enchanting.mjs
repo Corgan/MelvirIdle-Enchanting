@@ -800,7 +800,7 @@ class EnchantingEquipmentItem extends EquipmentItem {
     set equipmentStats(_) { }
     get equipmentStats() {
         let stats = [...this.item.equipmentStats];
-        stats = stats.map(stat => (stat.key !== 'attackSpeed' ? { key: stat.key, value: Math.floor(stat.value * this.scale) } : stat));
+        stats = stats.map(stat => (stat.key !== 'attackSpeed' && stat.key !== 'damageReduction' ? { key: stat.key, value: Math.floor(stat.value * this.scale) } : stat));
         return stats;
     }
     set hasDescription(_) { }
@@ -1003,7 +1003,7 @@ class EnchantingWeaponItem extends WeaponItem {
     set equipmentStats(_) { }
     get equipmentStats() {
         let stats = [...this.item.equipmentStats];
-        stats = stats.map(stat => (stat.key !== 'attackSpeed' ? { key: stat.key, value: Math.floor(stat.value * this.scale) } : stat));
+        stats = stats.map(stat => (stat.key !== 'attackSpeed' && stat.key !== 'damageReduction' ? { key: stat.key, value: Math.floor(stat.value * this.scale) } : stat));
         return stats;
     }
     set attackType(_) { }
@@ -1247,7 +1247,7 @@ class EnchantingUpgradedEquipmentItemWrapper extends EquipmentItem {
     set equipmentStats(_) { }
     get equipmentStats() {
         let stats = [...this.upgradedItem.equipmentStats];
-        stats = stats.map(stat => (stat.key !== 'attackSpeed' ? { key: stat.key, value: Math.floor(stat.value * this.scale) } : stat));
+        stats = stats.map(stat => (stat.key !== 'attackSpeed' && stat.key !== 'damageReduction' ? { key: stat.key, value: Math.floor(stat.value * this.scale) } : stat));
         return stats;
     }
     set hasDescription(_) { }
@@ -1424,7 +1424,7 @@ class EnchantingUpgradedWeaponItemWrapper extends WeaponItem {
     set equipmentStats(_) { }
     get equipmentStats() {
         let stats = [...this.upgradedItem.equipmentStats];
-        stats = stats.map(stat => (stat.key !== 'attackSpeed' ? { key: stat.key, value: Math.floor(stat.value * this.scale) } : stat));
+        stats = stats.map(stat => (stat.key !== 'attackSpeed' && stat.key !== 'damageReduction' ? { key: stat.key, value: Math.floor(stat.value * this.scale) } : stat));
         return stats;
     }
     set attackType(_) { }
@@ -1485,7 +1485,7 @@ class EnchantingUpgradedWeaponItemWrapper extends WeaponItem {
     set specialAttacks(_) { }
     get specialAttacks() {
         let specials = [...this.upgradedItem.specialAttacks];
-        if(this.extraSpecials.size > 0) {
+        if(this.item.extraSpecials.size > 0) {
             let extraSpecials = [...this.item.extraSpecials].map(special => special.specialAttacks[Math.max(0, this.item.quality - special.quality)]);
             specials = specials.concat(extraSpecials);
         }
