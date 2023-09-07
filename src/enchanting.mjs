@@ -598,6 +598,7 @@ class ItemEnchantIcon extends ItemQtyIcon {
         this.container.onclick = callback;
     }
     updateQty() {
+        this.container.classList.toggle('bg-trader-locked', game.bank.lockedItems.has(this.item));
         this.qty = this.getCurrentQty();
         this.setText(this.qty);
     }
@@ -636,6 +637,7 @@ class EnchantingItemSelector extends ContainedComponent {
         });
         this.icons = [];
     }
+    
     updateQty() {
         this.icons = this.icons.filter((icon)=> {
             icon.updateQty();
@@ -1833,6 +1835,11 @@ class Enchanting extends Skill {
         if(this.isActive) {
             this.stop();
         } else if(this.selectedAction !== undefined && this.selectedItem !== undefined) {
+            
+            if(game.bank.lockedItems.has(this.selectedItem)) {
+                notifyPlayer(this, "Item is locked.", 'danger');
+                return;
+            }
             if(this.isCostEmpty(this.getCurrentActionCosts())) {
                 notifyPlayer(this, "Can't perform this action", 'danger');
                 return;
@@ -2004,6 +2011,7 @@ class Enchanting extends Skill {
         if (!this.renderQueue.quantities)
             return;
         this.menu.updateQuantities();
+        this.itemSelector.updateQty();
         this.renderQueue.quantities = false;
     }
 
@@ -2192,7 +2200,7 @@ class Enchanting extends Skill {
         return multiplier;
     }
 
-    getEssenceForItem(item, quality) {
+    getEssenceForItem(item, quality, quantity=1) {
         let essence;
         switch (quality) {
             case 5:
@@ -2215,7 +2223,7 @@ class Enchanting extends Skill {
                 essence = game.items.getObjectByID('enchanting:Common_Essence');
                 break;
         }
-        return [ essence, this.getItemLevelMultiplier(item) ];
+        return [ essence, this.getItemLevelMultiplier(item) * quantity ];
     }
 
     giveAutoDisenchantRewards(item, quality) {
@@ -2232,13 +2240,13 @@ class Enchanting extends Skill {
         if(dropQuality > 0) {
             if(this.autoDisenchantRewards >= dropQuality) {
                 this.giveAutoDisenchantRewards(item, dropQuality);
-                [ item, quantity ] = this.getEssenceForItem(item, dropQuality);
+                [ item, quantity ] = this.getEssenceForItem(item, dropQuality, quantity);
             } else {
                 item = this.createEnchantingItem(item, dropQuality);
             }
         } else if (this.autoDisenchantRewards > -1 && this.includeCommonRewards) {
             this.giveAutoDisenchantRewards(item, dropQuality);
-            [ item, quantity ] = this.getEssenceForItem(item, dropQuality);
+            [ item, quantity ] = this.getEssenceForItem(item, dropQuality, quantity);
         }
         return [item, quantity];
     }
@@ -2249,13 +2257,13 @@ class Enchanting extends Skill {
         if(dropQuality > 0) {
             if(this.autoDisenchantDrops >= dropQuality) {
                 this.giveAutoDisenchantRewards(item, dropQuality);
-                [ item, quantity ] = this.getEssenceForItem(item, dropQuality);
+                [ item, quantity ] = this.getEssenceForItem(item, dropQuality, quantity);
             } else {
                 item = this.createEnchantingItem(item, dropQuality);
             }
         } else if (this.autoDisenchantDrops > -1 && this.includeCommonDrops) {
             this.giveAutoDisenchantRewards(item, dropQuality);
-            [ item, quantity ] = this.getEssenceForItem(item, dropQuality);
+            [ item, quantity ] = this.getEssenceForItem(item, dropQuality, quantity);
         }
         return { item, quantity };
     }
@@ -2289,15 +2297,17 @@ class Enchanting extends Skill {
         let itemUpgrades = game.bank.itemUpgrades.get(item.item);
         if(itemUpgrades !== undefined && itemUpgrades.length > 0) {
             itemUpgrades.forEach(itemUpgrade => {
-                let upgrade = new EnchantingItemUpgrade(item, itemUpgrade);
-                upgrade.rootItems.forEach((root)=>{
-                    let upgradeArray = game.bank.itemUpgrades.get(root);
-                    if (upgradeArray === undefined) {
-                        upgradeArray = [];
-                        game.bank.itemUpgrades.set(root, upgradeArray);
-                    }
-                    upgradeArray.push(upgrade);
-                });
+                if(itemUpgrade.constructor !== EnchantingItemUpgrade) {
+                    let upgrade = new EnchantingItemUpgrade(item, itemUpgrade);
+                    upgrade.rootItems.forEach((root)=>{
+                        let upgradeArray = game.bank.itemUpgrades.get(root);
+                        if (upgradeArray === undefined) {
+                            upgradeArray = [];
+                            game.bank.itemUpgrades.set(root, upgradeArray);
+                        }
+                        upgradeArray.push(upgrade);
+                    });
+                }
             });
         }
     }

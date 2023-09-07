@@ -156,7 +156,7 @@ export async function setup({ characterStorage, gameData, patch, loadTemplates, 
 
     patch(NamespaceRegistry, 'getObjectByID').replace(function(o, id) {
         let obj = o(id);
-        if(obj === undefined && id !== undefined && id.startsWith("enchanting")) {
+        if(obj === undefined && id !== undefined && typeof id === "string" && id.startsWith("enchanting")) {
             return game.enchanting.handleMissingObject(id);
         }
         return obj;
