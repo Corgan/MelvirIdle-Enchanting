@@ -1774,6 +1774,10 @@ class Enchanting extends Skill {
 
     onLoad() {
         super.onLoad();
+
+        if(game.currentGamemode.allowDungeonLevelCapIncrease === true)
+            game.currentGamemode.startingSkills.add(game.enchanting);
+
         this.itemSelector.updateItems();
         this.menu.localize();
         this.menu.setActionCallback(()=>{ this.actionButtonOnClick() });
@@ -2497,6 +2501,7 @@ class Enchanting extends Skill {
             return;
         this.game.stats.Items.statsMap.delete(item);
         this.game.bank.glowingItems.delete(item);
+        this.game.bank.lockedItems.delete(item);
         let sortIdx = this.game.bank.customSortOrder.indexOf(item);
         if(sortIdx > -1)
             this.game.bank.customSortOrder.splice(this.game.bank.customSortOrder.indexOf(item), 1);
@@ -2541,6 +2546,9 @@ class Enchanting extends Skill {
             this.makeUpgrades(item);
         })
         game.combat.player.computeAllStats();
+
+        if(game.currentGamemode.allowDungeonLevelCapIncrease === true && !this.isUnlocked)
+            this.setUnlock(true);
     }
 
     onInterfaceAvailable() {
@@ -2603,12 +2611,8 @@ class Enchanting extends Skill {
 
         try {
             super.decode(reader, version);
-            let saveVersion = reader.getUint32();
-            if(saveVersion < 369) { // Less than when we implemented the save version... Hope nobody has more than 370 equipment items :D
-                reader.byteOffset -= Uint32Array.BYTES_PER_ELEMENT;
-            } else {
-                this.saveVersion = saveVersion;
-            }
+            this.saveVersion = reader.getUint32();
+            
             console.log("Decoding Equipment");
             reader.getArray((reader) => {
                 let value = reader.getNamespacedObject(this.equipment);

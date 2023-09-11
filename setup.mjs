@@ -1,44 +1,4 @@
 export async function setup({ characterStorage, gameData, patch, loadTemplates, loadStylesheet, loadModule, onInterfaceAvailable, onCharacterLoaded }) {
-    if(window.selectFromWeightedArray === undefined) {
-        function selectFromWeightedArray(array, totalWeight) {
-            const tableRoll = Math.floor(Math.random() * totalWeight);
-            let cumWeight = 0;
-            const rollIndex = array.findIndex((value)=>{
-                cumWeight += value.weight;
-                return tableRoll < cumWeight;
-            }
-            );
-            return array[rollIndex];
-        }
-
-        window.selectFromWeightedArray = selectFromWeightedArray;
-    }
-    if(window.formatModifiers === undefined) {
-        function formatModifiers(formatter, modifiers, negMult=1, posMult=1) {
-            const descriptions = [];
-            Object.entries(modifiers).forEach((entry)=>{
-                const isNeg = modifierData[entry[0]].isNegative;
-                const mult = isNeg ? negMult : posMult;
-                if (isSkillEntry(entry)) {
-                    entry[1].forEach((data)=>{
-                        const modifiedData = Object.assign(Object.assign({}, data), {
-                            value: data.value * mult
-                        });
-                        const [desc,textClass] = printPlayerModifier(entry[0], modifiedData);
-                        descriptions.push(formatter(desc, textClass));
-                    }
-                    );
-                } else {
-                    const [desc,textClass] = printPlayerModifier(entry[0], entry[1] * mult);
-                    descriptions.push(formatter(desc, textClass));
-                }
-            }
-            );
-            return descriptions;
-        }
-        window.formatModifiers = formatModifiers;
-    }
-
     console.log("Loading Enchanting Templates");
     await loadTemplates("templates.html"); // Add templates
     
@@ -54,6 +14,25 @@ export async function setup({ characterStorage, gameData, patch, loadTemplates, 
     await gameData.addPackage('data.json'); // Add skill data (page + sidebar, skillData)
 
     console.log('Registered Enchanting Data.');
+
+    const _determineRandomSkillsForUnlock = determineRandomSkillsForUnlock;
+    window.determineRandomSkillsForUnlock = function(...args) {
+        game.enchanting.setUnlock(false);
+        _determineRandomSkillsForUnlock(...args);
+        game.enchanting.setUnlock(true);
+    }
+
+    patch(CombatManager, 'awardSkillLevelCapIncreaseForDungeonCompletion').before(function(dungeon) {
+        if (dungeon.id === "melvorF:Impending_Darkness" || dungeon.id === "melvorTotH:Throne_of_the_Herald") {
+            // We do nothing here beacuse it's handled in the base call
+        } else if (dungeon.namespace === "melvorTotH") {
+            const amount = Math.min(3, 120 - this.game.attack.overrideLevelCap);
+            this.game.enchanting.increaseLevelCap(amount);
+        } else {
+            const amount = Math.min(5, 99 - this.game.attack.overrideLevelCap);
+            this.game.enchanting.increaseLevelCap(amount);
+        }
+    });
 
     patch(Bank, 'addItem').before(function(item, quantity, ...args) {
         if (item.constructor === EnchantingUpgradedWeaponItemWrapper) {
@@ -164,7 +143,7 @@ export async function setup({ characterStorage, gameData, patch, loadTemplates, 
 
     onCharacterLoaded(async () => {
         game.enchanting.onCharacterLoaded();
-    })
+    });
 
     onInterfaceAvailable(async () => {
         console.log("Appending Enchanting Page");
