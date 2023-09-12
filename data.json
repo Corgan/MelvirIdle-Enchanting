@@ -169,10 +169,110 @@
         "isDowngrade": false
       }
     ],
+    "ancientRelics": [
+        {
+            "id": "EnchantingRelic1",
+            "name": "Enchanting Relic 1 (NYI)",
+            "skillID": "enchanting:Enchanting",
+            "number": 1,
+            "description": "A relic from the ancient times of enchanting.",
+            "modifiers": {
+              
+            }
+        },
+        {
+            "id": "EnchantingRelic2",
+            "name": "Enchanting Relic 2 (NYI)",
+            "skillID": "enchanting:Enchanting",
+            "number": 2,
+            "description": "A relic from the ancient times of enchanting.",
+            "modifiers": {
+            }
+        },
+        {
+            "id": "EnchantingRelic3",
+            "name": "Enchanting Relic 3 (NYI)",
+            "skillID": "enchanting:Enchanting",
+            "number": 3,
+            "description": "A relic from the ancient times of enchanting.",
+            "modifiers": {
+            }
+        },
+        {
+            "id": "EnchantingRelic4",
+            "name": "Enchanting Relic 4 (NYI)",
+            "skillID": "enchanting:Enchanting",
+            "number": 4,
+            "description": "A relic from the ancient times of enchanting.",
+            "modifiers": {
+            }
+        },
+        {
+            "id": "EnchantingRelic5",
+            "name": "Enchanting Relic 5 (NYI)",
+            "skillID": "enchanting:Enchanting",
+            "number": 5,
+            "description": "A relic from the ancient times of enchanting.",
+            "modifiers": {
+            }
+        },
+        {
+            "id": "EnchantingRelic6",
+            "name": "Enchanting Master Relic (NYI)",
+            "skillID": "enchanting:Enchanting",
+            "number": 6,
+            "description": "A relic from the ancient times of enchanting.",
+            "modifiers": {
+            }
+        }
+    ],
     "skillData": [
       {
         "skillID": "enchanting:Enchanting",
         "data": {
+          "completedAncientRelic": "enchanting:EnchantingRelic6",
+          "ancientRelics": [
+              {
+                  "relicID": "enchanting:EnchantingRelic1",
+                  "requirements": [],
+                  "chance": {
+                      "type": "Fixed",
+                      "chance": 0.0005
+                  }
+              },
+              {
+                  "relicID": "enchanting:EnchantingRelic2",
+                  "requirements": [],
+                  "chance": {
+                      "type": "Fixed",
+                      "chance": 0.0005
+                  }
+              },
+              {
+                  "relicID": "enchanting:EnchantingRelic3",
+                  "requirements": [],
+                  "chance": {
+                      "type": "Fixed",
+                      "chance": 0.0005
+                  }
+              },
+              {
+                  "relicID": "enchanting:EnchantingRelic4",
+                  "requirements": [],
+                  "chance": {
+                      "type": "Fixed",
+                      "chance": 0.0005
+                  }
+              },
+              {
+                  "relicID": "enchanting:EnchantingRelic5",
+                  "requirements": [],
+                  "chance": {
+                      "type": "Fixed",
+                      "chance": 0.0005
+                  }
+              }
+          ],
           "actions": [
             {
               "id": "Enchant",

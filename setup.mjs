@@ -5,6 +5,97 @@ export async function setup({ characterStorage, gameData, patch, loadTemplates, 
     console.log("Loading Enchanting Stylesheet");
     await loadStylesheet('style.css');
 
+    modifierData.increasedUpgradeEssenceChance = {
+        get langDescription() {
+            return "+${value}% chance to disenchant essence at the next tier.";
+        },
+        description: '+${value}% chance to disenchant essence at the next tier.',
+        isSkill: false,
+        isNegative: false,
+        tags: []
+    };
+    modifierData.decreasedUpgradeEssenceChance = {
+        get langDescription() {
+            return "-${value}% chance to disenchant essence at the next tier.";
+        },
+        description: '-${value}% chance to disenchant essence at the next tier.',
+        isSkill: false,
+        isNegative: true,
+        tags: []
+    };
+    modifierData.increasedItemRarityChance = {
+        get langDescription() {
+            return "+${value}% chance for item to drop at the next tier.";
+        },
+        description: '+${value}% chance for item to drop at the next tier.',
+        isSkill: false,
+        isNegative: false,
+        tags: []
+    };
+    modifierData.decreasedItemRarityChance = {
+        get langDescription() {
+            return "-${value}% chance for item to drop at the next tier.";
+        },
+        description: '-${value}% chance for item to drop at the next tier.',
+        isSkill: false,
+        isNegative: true,
+        tags: []
+    };
+    modifierData.increasedEnchantCost = {
+        get langDescription() {
+            return "+${value}% cost of enchanting items.";
+        },
+        description: '+${value}% cost of enchanting items.',
+        isSkill: false,
+        isNegative: true,
+        tags: []
+    };
+    modifierData.decreasedEnchantCost = {
+        get langDescription() {
+            return "-${value}% cost of enchanting items.";
+        },
+        description: '-${value}% cost of enchanting items.',
+        isSkill: false,
+        isNegative: false,
+        tags: []
+    };
+    modifierData.increasedEnchantRerollCost = {
+        get langDescription() {
+            return "+${value}% cost of rerolling modifiers on enchanted items.";
+        },
+        description: '+${value}% cost of rerolling modifiers on enchanted items.',
+        isSkill: false,
+        isNegative: true,
+        tags: []
+    };
+    modifierData.decreasedEnchantRerollCost = {
+        get langDescription() {
+            return "-${value}% cost of rerolling modifiers on enchanted items.";
+        },
+        description: '-${value}% cost of rerolling modifiers on enchanted items.',
+        isSkill: false,
+        isNegative: false,
+        tags: []
+    };
+    modifierData.increasedEssenceQuantity = {
+        get langDescription() {
+            return "+${value}% essence from disenchanting.";
+        },
+        description: '+${value}% essence from disenchanting.',
+        isSkill: false,
+        isNegative: false,
+        tags: []
+    };
+    modifierData.decreasedEssenceQuantity = {
+        get langDescription() {
+            return "-${value}% essence from disenchanting.";
+        },
+        description: '-${value}% essence from disenchanting.',
+        isSkill: false,
+        isNegative: true,
+        tags: []
+    };
+
     console.log("Loading Enchanting Module");
     const { Enchanting, EnchantingUpgradedWeaponItemWrapper, EnchantingUpgradedEquipmentItemWrapper, EnchantingItemUpgrade } = await loadModule('src/enchanting.mjs');
 
