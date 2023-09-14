@@ -2314,6 +2314,11 @@ class Enchanting extends Skill {
                 }
             });
         }
+
+        if(game.softDataRegQueue.length > 0) {
+            game.softDataRegQueue.forEach(([data,object])=>object.registerSoftDependencies(data, game));
+            game.softDataRegQueue = [];
+        }
     }
 
     handleMissingObject(namespacedID) {
@@ -2620,6 +2625,12 @@ class Enchanting extends Skill {
                 value.decode(reader);
                 return value;
             });
+
+            if(game.softDataRegQueue.length > 0) {
+                game.softDataRegQueue.forEach(([data,object])=>object.registerSoftDependencies(data, game));
+                game.softDataRegQueue = [];
+            }
+
             this.actionTimer.decode(reader, version);
             if (reader.getBoolean()) {
                 const selectedItem = reader.getNamespacedObject(this.game.items);
