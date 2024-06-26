@@ -1227,10 +1227,41 @@ export async function setup({ characterStorage, gameData, patch, loadTemplates, 
     console.log("Loading Enchanting Module");
     const { Enchanting, EnchantingUpgradedWeaponItemWrapper, EnchantingUpgradedEquipmentItemWrapper, EnchantingItemUpgrade } = await loadModule('src/enchanting.mjs');
 
-    game.enchanting = game.registerSkill(game.registeredNamespaces.getNamespace('enchanting'), Enchanting); // Register skill
+    game.enchanting = game.registerSkill(game.registeredNamespaces.getNamespace('enchanting'), Enchanting);
 
     console.log("Registering Enchanting Data");
-    await gameData.addPackage('data.json'); // Add skill data (page + sidebar, skillData)
+    await gameData.addPackage('data/data.json');
+
+    if(cloudManager.hasAoDEntitlementAndIsEnabled) {
+        await gameData.addPackage('data/data-aod.json');
+
+        const levelCapIncreases = ['enchanting:Pre99Dungeons', 'enchanting:ImpendingDarknessSet100'];
+
+        if(cloudManager.hasTotHEntitlementAndIsEnabled) {
+            levelCapIncreases.push(...['enchanting:Post99Dungeons', 'enchanting:ThroneOfTheHeraldSet120']);
+        }
+
+        await gameData.addPackage({
+            $schema: '',
+            namespace: 'enchanting',
+            modifications: {
+                gamemodes: [
+                    {
+                        id: 'melvorAoD:AncientRelics',
+                        levelCapIncreases: {
+                            add: levelCapIncreases
+                        }
+                    }
+                ]
+            }
+        });
+    }
+    
+    patch(EventManager, 'loadEvents').after(() => {
+        if(game.currentGamemode.startingSkills !== undefined && game.currentGamemode.startingSkills.has(game.enchanting)) {
+            game.enchanting.setUnlock(true);
+        }
+    });
 
     console.log('Registered Enchanting Data.');
 

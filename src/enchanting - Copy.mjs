@@ -2640,9 +2640,6 @@ class Enchanting extends Skill {
             this.makeUpgrades(item);
         })
         game.combat.player.computeAllStats();
-
-        if(game.currentGamemode.allowDungeonLevelCapIncrease === true && !this.isUnlocked)
-            this.setUnlock(true);
     }
 
     onInterfaceAvailable() {

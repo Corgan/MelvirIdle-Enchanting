@@ -1,2 +1,2 @@
-# MelvorIdle-Enchanting
- Enchanting Skill for Melvor Idle
+# MelvorIdle-Bling
+ Bling Bling for Melvor Idle
