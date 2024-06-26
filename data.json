@@ -305,6 +305,7 @@
               "level": 1,
               "tags": [],
               "quality": 1,
+              "modifier": "accuracyRating",
               "value": [
                 1,
                 2,
@@ -318,6 +319,7 @@
               "level": 1,
               "tags": [],
               "quality": 1,
+              "modifier": "maxHit",
               "value": [
                 1,
                 2,
@@ -333,6 +335,7 @@
                 "armour"
               ],
               "quality": 1,
+              "modifier": "evasion",
               "value": [
                 1,
                 2,
@@ -348,6 +351,7 @@
                 "melee"
               ],
               "quality": 1,
+              "modifier": "meleeAccuracyRating",
               "value": [
                 2,
                 4,
@@ -363,6 +367,7 @@
                 "melee"
               ],
               "quality": 1,
+              "modifier": "meleeMaxHit",
               "value": [
                 2,
                 4,
@@ -379,6 +384,7 @@
                 "armour"
               ],
               "quality": 1,
+              "modifier": "mrleeEvasion",
               "value": [
                 2,
                 4,
@@ -394,6 +400,7 @@
                 "ranged"
               ],
               "quality": 1,
+              "modifier": "rangedAccuracyRating",
               "value": [
                 2,
                 4,
@@ -409,6 +416,7 @@
                 "ranged"
               ],
               "quality": 1,
+              "modifier": "rangedMaxHit",
               "value": [
                 2,
                 4,
@@ -425,6 +433,7 @@
                 "armour"
               ],
               "quality": 1,
+              "modifier": "rangedEvasion",
               "value": [
                 2,
                 4,
@@ -440,6 +449,7 @@
                 "magic"
               ],
               "quality": 1,
+              "modifier": "magicAccuracyRating",
               "value": [
                 2,
                 4,
@@ -455,6 +465,7 @@
                 "magic"
               ],
               "quality": 1,
+              "modifier": "magicMaxHit",
               "value": [
                 2,
                 4,
@@ -471,6 +482,7 @@
                 "armour"
               ],
               "quality": 1,
+              "modifier": "magicEvasion",
               "value": [
                 2,
                 4,
@@ -486,12 +498,13 @@
                 "weapon"
               ],
               "quality": 1,
+              "modifier": "attackInterval",
               "value": [
-                5,
-                5,
-                10,
-                10,
-                15
+                -5,
+                -5,
+                -10,
+                -10,
+                -15
               ]
             },
             {
@@ -501,6 +514,7 @@
                 "armour"
               ],
               "quality": 1,
+              "modifier": "maxHitpoints",
               "value": [
                 1,
                 2,
@@ -514,6 +528,7 @@
               "level": 1,
               "tags": [],
               "quality": 1,
+              "modifier": "minHitBasedOnMaxHit",
               "value": [
                 1,
                 2,
@@ -527,6 +542,7 @@
               "level": 1,
               "tags": [],
               "quality": 2,
+              "modifier": "lifesteal",
               "value": [
                 2,
                 3,
@@ -541,6 +557,7 @@
                 "melee"
               ],
               "quality": 2,
+              "modifier": "meleeLifesteal",
               "value": [
                 4,
                 6,
@@ -555,6 +572,7 @@
                 "ranged"
               ],
               "quality": 2,
+              "modifier": "rangedLifesteal",
               "value": [
                 4,
                 6,
@@ -569,6 +587,7 @@
                 "magic"
               ],
               "quality": 2,
+              "modifier": "magicLifesteal",
               "value": [
                 4,
                 6,
@@ -583,6 +602,7 @@
                 "melee"
               ],
               "quality": 2,
+              "modifier": "meleeCritChance",
               "value": [
                 2,
                 3,
@@ -597,6 +617,7 @@
                 "ranged"
               ],
               "quality": 2,
+              "modifier": "rangedCritChance",
               "value": [
                 2,
                 3,
@@ -611,6 +632,7 @@
                 "magic"
               ],
               "quality": 2,
+              "modifier": "magicCritChance",
               "value": [
                 2,
                 3,
@@ -623,6 +645,10 @@
               "level": 1,
               "tags": [],
               "quality": 3,
+              "combatEffect": {
+                "effectID": "melvorD:Poison",
+                "appliesWhen": "HitWithAttack"
+              },
               "value": [
                 3,
                 4,
@@ -634,6 +660,10 @@
               "level": 1,
               "tags": [],
               "quality": 3,
+              "combatEffect": {
+                "effectID": "melvorD:DeadlyPoison",
+                "appliesWhen": "HitWithAttack"
+              },
               "value": [
                 3,
                 4,
@@ -645,6 +675,10 @@
               "level": 1,
               "tags": [],
               "quality": 3,
+              "combatEffect": {
+                "effectID": "melvorD:Frostburn",
+                "appliesWhen": "PostAttack"
+              },
               "value": [
                 3,
                 4,
@@ -656,6 +690,10 @@
               "level": 1,
               "tags": [],
               "quality": 3,
+              "combatEffect": {
+                "effectID": "melvorD:Burn",
+                "appliesWhen": "PostAttack"
+              },
               "value": [
                 3,
                 4,
@@ -667,6 +705,11 @@
               "level": 1,
               "tags": [],
               "quality": 3,
+              "combatEffect": {
+                "effectID": "melvorTotH:Shock",
+                "appliesWhen": "PostAttack",
+                "descriptionLang": "CUSTOM_APPLICATOR_SHOCK_ON_ATTACK"
+              },
               "value": [
                 3,
                 4,
@@ -680,6 +723,7 @@
                 "weapon"
               ],
               "quality": 4,
+              "modifier": "attackRolls",
               "value": [
                 1,
                 1
@@ -692,9 +736,16 @@
                 "armour"
               ],
               "quality": 4,
+              "modifier": "resistance",
               "value": [
-                1,
-                2
+                [{
+                  "damageTypeID": "melvorD:Normal",
+                  "value": 1
+                }],
+                [{
+                  "damageTypeID": "melvorD:Normal",
+                  "value": 2
+                }]
               ]
             }
           ],

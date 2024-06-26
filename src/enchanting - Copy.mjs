@@ -1,50 +1,118 @@
 const { loadModule, getResourceUrl, version } = mod.getContext(import.meta);
 
-class ActionIcon extends InfoIcon {
-    constructor(parent, size) {
-        super(parent, 'd-none', size);
+class EnchantingActionIcon extends HTMLElement {
+    constructor() {
+        super();
+        this._content = new DocumentFragment();
+        this._content.append(getTemplateNode('enchanting-action-icon-template'));
+        this.container = getElementFromFragment(this._content, 'container', 'div');
+        this.image = getElementFromFragment(this._content, 'image', 'img');
+        this.tooltipElem = createElement('div', {
+            className: 'text-center'
+        });
     }
     setCallback(callback) {
         this.container.onclick = callback;
     }
     setAction(action) {
         this.action = action;
-        this.setImage(action.media);
-        this.setTooltip(action.name);
+        this.image.src = action.media;
+        this.tooltipElem.textContent = action.name;
     }
 }
+window.customElements.define('enchanting-action-icon', EnchantingActionIcon);
 
+class EnchantingActionIconsElement extends HTMLElement {
+    constructor() {
+        super();
+        this.icons = [];
+        this._content = new DocumentFragment();
+        this._content.append(getTemplateNode('enchanting-action-icons-template'));
+        this.emptyText = getElementFromFragment(this._content, 'empty-text', 'span');
+    }
+    connectedCallback() {
+        this.appendChild(this._content);
+    }
+    removeIcons() {
+        this.icons.forEach((elem)=>elem.remove());
+        this.icons = [];
+    }
+    setSelected() {
+        this.icons.forEach(showElement);
+        hideElement(this.emptyText);
+    }
+    setUnselected() {
+        this.icons.forEach(hideElement);
+        this.emptyText.textContent = '-';
+        this.emptyText.classList.remove('text-success');
+        showElement(this.emptyText);
+    }
+    addAction(action) {
+        const actionIcon = createElement('enchanting-action-icon', {
+            parent: this
+        });
+        actionIcon.setAction(action);
+        this.icons.push(actionIcon);
+        return actionIcon;
+    }
+    addActions(actions) {
+        actions.forEach((action)=>{
+            const actionIcon = createElement('enchanting-action-icon', {
+                parent: this
+            });
+            actionIcon.setAction(action);
+            this.icons.push(actionIcon);
+        });
+    }
+    setActions(actions) {
+        this.removeIcons();
+        this.addActions(actions);
+    }
+}
+window.customElements.define('enchanting-action-icons', EnchantingActionIconsElement);
 
-class ActionsBox extends IconBox {
-    constructor(parent, smallName, containerClasses=[], iconContClasses=[]) {
-        super(parent, smallName, containerClasses, iconContClasses);
-        this.size = 48;
-        this.localize();
+class EnchantingActionsBox extends HTMLElement {
+    constructor() {
+        super();
+        this._content = new DocumentFragment();
+        this._content.append(getTemplateNode('enchanting-actions-box-template'));
+        this.actionIcons = getElementFromFragment(this._content, 'icons', 'enchanting-actions-icons');
+    }
+    connectedCallback() {
+        this.appendChild(this._content);
+    }
+    destroyIcons() {
+        this.actionIcons.removeIcons();
     }
     setSelected(action) {
-        let old = this.icons.find(icon => icon.container.classList.contains('bg-easy-task'));
+        let old = this.actionIcons.icons.find(icon => icon.container.classList.contains('bg-easy-task'));
         if(old !== undefined)
             old.container.classList.remove('bg-easy-task');
-        let icon = this.icons.find(icon => icon.action === action);
+        let icon = this.actionIcons.icons.find(icon => icon.action === action);
         if(icon !== undefined)
             icon.container.classList.add('bg-easy-task');
     }
-    addAction(action) {
-        const actionIcon = new ActionIcon(this.iconContainer, this.size);
-        actionIcon.setAction(action);
-        this.addIcon(actionIcon);
-        return actionIcon;
+    setUnselected() {
+        this.actionIcons.setUnselected();
     }
-    localize() {
-        super.localize();
-        this.setName('Action');
+    addAction(action) {
+        return this.actionIcons.addAction(action);
     }
 }
+window.customElements.define('enchanting-actions-box', EnchantingActionsBox);
 
-class AutoDisenchantBox extends ContainedComponent {
-    constructor(parent, containerClasses=[], enchanting) {
+class AutoDisenchantBox extends HTMLElement {
+    constructor() {
         super();
-        this.enchanting = enchanting;
+        this._content = new DocumentFragment();
+        this._content.append(getTemplateNode('auto-disenchant-box-template'));
+    }
+    connectedCallback() {
+        this.appendChild(this._content);
+    }
+    
+    /*
+    constructor(parent, containerClasses=[], enchanting) {
         this.icons = [];
         this.container = createElement('div', {
             classList: containerClasses
@@ -94,11 +162,11 @@ class AutoDisenchantBox extends ContainedComponent {
         });
         this.rewardsSwitch = new SettingsSwitchElement();
         this.rewardsSwitch.initialize({
-            currentValue: this.enchanting.includeCommonRewards,
+            currentValue: game.enchanting.includeCommonRewards,
             name: "Include Common?"
         },
         () => {
-            this.enchanting.includeCommonRewards = this.rewardsSwitch.input.checked;
+            game.enchanting.includeCommonRewards = this.rewardsSwitch.input.checked;
         });
         this.rewardsSwitch.setAttribute('data-size', 'small');
         this.rewardsSwitchCont.append(this.rewardsSwitch);
@@ -109,17 +177,30 @@ class AutoDisenchantBox extends ContainedComponent {
         });
         this.dropsSwitch = new SettingsSwitchElement();
         this.dropsSwitch.initialize({
-            currentValue: this.enchanting.includeCommonDrops,
+            currentValue: game.enchanting.includeCommonDrops,
             name: "Include Common?"
         },
         () => {
-            this.enchanting.includeCommonDrops = this.dropsSwitch.input.checked;
+            game.enchanting.includeCommonDrops = this.dropsSwitch.input.checked;
         });
         this.dropsSwitch.setAttribute('data-size', 'small');
         this.dropsSwitchCont.append(this.dropsSwitch);
 
 
         parent.append(this.container);
+    }
+    */
+    show() {
+        showElement(this.container);
+    }
+    hide() {
+        hideElement(this.container);
+    }
+    invisible() {
+        this.container.classList.add('invisible');
+    }
+    visible() {
+        this.container.classList.remove('invisible');
     }
     setName(name) {
         this.name.textContent = name;
@@ -175,6 +256,7 @@ class AutoDisenchantBox extends ContainedComponent {
         });
     }
 }
+window.customElements.define('auto-disenchant-box', AutoDisenchantBox);
 
 class RerollRadioButton extends HTMLElement {
     constructor() {
@@ -212,10 +294,8 @@ class RerollRadioButton extends HTMLElement {
 RerollRadioButton.elementCount = 0;
 window.customElements.define('reroll-radio', RerollRadioButton);
 
-class RerollBox extends ContainedComponent {
+class RerollBox {
     constructor(parent, containerClasses=[], enchanting) {
-        super();
-        this.enchanting = enchanting;
         this.icons = [];
         this.container = createElement('div', {
             classList: containerClasses
@@ -235,23 +315,30 @@ class RerollBox extends ContainedComponent {
 
         parent.append(this.container);
     }
+    show() {
+        showElement(this.container);
+    }
+    hide() {
+        hideElement(this.container);
+    }
+    invisible() {
+        this.container.classList.add('invisible');
+    }
+    visible() {
+        this.container.classList.remove('invisible');
+    }
     setName(name) {
         this.name.textContent = name;
     }
     updateMod(item, mod, index) {
         if(mod !== undefined) {
             let mods = {};
-            mods[mod.modifier] = mod.value[Math.max(0, item.quality - mod.quality)];
-            let modifierSpans;
+            mods[mod._localID] = mod.value[Math.max(0, item.quality - mod.quality)];
             
-            try {
-                modifierSpans = formatModifiers((desc,textClass)=>{
-                    textClass = `text-enchanting-quality-${this.quality}`;
-                    return `<span class="${textClass}">${desc.text}</span>`;
-                }, game.getModifierValuesFromData(mods), 1, 1);
-            } catch(e) {
-                modifierSpans =  [`<span class="text-enchanting-quality-${this.quality}">${mod._localID}</span>`];
-            }
+            let modifierSpans = formatModifiers((desc,textClass)=>{
+                textClass = `text-enchanting-quality-${item.quality}`;
+                return `<span class="${textClass}">${desc}</span>`;
+            }, mods, 1, 1);
 
             let modSpan = `<small>${modifierSpans[0]}</small>`;
 
@@ -300,54 +387,25 @@ class RerollBox extends ContainedComponent {
     getSelectedMod() {
         let selectedRadio = this.rerollRadioGroup.filter(i => i.input.checked)[0];
         if(selectedRadio !== undefined) {
-            let mod = this.enchanting.mods.getObjectByID(selectedRadio.input.value);
+            let mod = game.enchanting.mods.getObjectByID(selectedRadio.input.value);
             if(mod !== undefined)
                 return mod;
         }
     }
 }
 
-class EnchantingMenu extends ContainedComponent {
-    constructor(enchanting) {
+class EnchantingMenu extends HTMLElement {
+    constructor() {
         super();
-
-        this.enchanting = enchanting;
         this.progressTimestamp = 0;
         this.progressInterval = 0;
-        this.parent = document.getElementById('enchanting-menu-container');
-        this.container = this.parent.appendChild(createElement('div', {
-            classList: ['col-12']
-        })).appendChild(createElement('div', {
-            classList: ['block-content', 'block-content-full']
-        })).appendChild(createElement('div', {
-            classList: ['row', 'gutters-tiny']
-        })).appendChild(createElement('div', {
-            classList: ['col-12']
-        }));
+        this._content = new DocumentFragment();
+        this._content.append(getTemplateNode('enchanting-menu-template'));
+        this.actions = getElementFromFragment(this._content, 'actions', 'enchanting-actions-box');
 
-        const blockClasses = ['block', 'block-rounded-double', 'bg-combat-inner-dark'];
-        const colClasses = ['col-12', ...blockClasses];
-        const boxClasses = ['col-12', 'col-sm-6', 'pb-2'];
-
-        this.actionRow = createElement('div', {
-            classList: ['row', 'row-deck', 'gutters-tiny'],
-            parent: this.container
-        });
-        this.actionsBlock = this.actionRow.appendChild(createElement('div', {
-            classList: ['col-12']
-        })).appendChild(createElement('div', {
-            classList: [...blockClasses, 'pt-2', 'pl-2', 'pr-2', 'pb-1']
-        }));
-        const actionRow = createElement('div', {
-            classList: ['row', 'no-gutters'],
-            parent: this.actionsBlock
-        });
-        this.actions = new ActionsBox(actionRow, false, ['col-12', 'pb-2']);
-        hideElement(this.actions.dash);
-
-        const actions = this.enchanting.actions.allObjects.forEach(action => {
+        const actions = game.enchanting.actions.allObjects.forEach(action => {
             let actionIcon = this.actions.addAction(action);
-            actionIcon.setCallback(() => this.enchanting.selectActionOnClick(action))
+            actionIcon.setCallback(() => game.enchanting.selectActionOnClick(action))
         });
 
         this.autoDisenchantRow = createElement('div', {
@@ -363,8 +421,8 @@ class EnchantingMenu extends ContainedComponent {
             classList: ['row', 'no-gutters'],
             parent: this.autoDisenchantsBlock
         });
-        this.autoDisenchantBox = new AutoDisenchantBox(autoDisenchantRow, ['col-12', 'pb-2'], this.enchanting);
-        this.autoDisenchantBox.updateDropdowns((i) => { this.enchanting.autoDisenchantRewards = i; }, (i) => { this.enchanting.autoDisenchantDrops = i; });
+        this.autoDisenchantBox = new AutoDisenchantBox(autoDisenchantRow, ['col-12', 'pb-2'], game.enchanting);
+        this.autoDisenchantBox.updateDropdowns((i) => { game.enchanting.autoDisenchantRewards = i; }, (i) => { game.enchanting.autoDisenchantDrops = i; });
         hideElement(this.autoDisenchantRow);
 
         this.nameRow = createElement('div', {
@@ -378,7 +436,7 @@ class EnchantingMenu extends ContainedComponent {
         }));
         this.productImage = this.productBlock.appendChild(createElement('img', {
             classList: ['bank-img-detail'],
-            attributes: [['src', this.enchanting.media]],
+            attributes: [['src', game.enchanting.media]],
         }));
         this.createBlock = this.nameRow.appendChild(createElement('div', {
             classList: ['col-8']
@@ -413,7 +471,7 @@ class EnchantingMenu extends ContainedComponent {
             classList: ['row', 'no-gutters'],
             parent: this.rerollBlock
         });
-        this.rerollBox = new RerollBox(rerollRow, ['col-12', 'pb-2'], this.enchanting);
+        this.rerollBox = new RerollBox(rerollRow, ['col-12', 'pb-2'], game.enchanting);
         hideElement(this.rerollRow);
 
         this.ingredientsCol = createElement('div', {
@@ -435,7 +493,7 @@ class EnchantingMenu extends ContainedComponent {
             classList: ['row', 'no-gutters'],
             parent: this.productsCol
         });
-        this.produces = new ProducesBox(prodRow,false,boxClasses);
+        this.produces = new ProducesBoxElement(prodRow,false,boxClasses);
         this.productIcon = new ItemQtyIcon(this.produces.iconContainer,false,0);
         this.productIcon.hide();
         this.produces.addIcon(this.productIcon);
@@ -454,16 +512,16 @@ class EnchantingMenu extends ContainedComponent {
             attributes: [['type', 'button'], ['style', 'height:48px;'], ],
         }));
         this.interval = new IntervalIcon(createRow,0);
-        const progressDiv = createRow.appendChild(createElement('div', {
+        this.progressBar = createRow.appendChild(createElement('div', {
             classList: ['col-12']
         })).appendChild(createElement('div', {
             classList: ['progress', 'active', 'mt-3'],
             attributes: [['style', 'height:5px;']]
-        })).appendChild(createElement('div', {
-            classList: ['progress-bar', 'bg-info'],
-            attributes: [['role', 'progressbar'], ['style', 'width:0%;'], ['aria-valuenow', '0'], ['aria-valuenow', '0'], ['aria-valuemin', '0'], ['aria-valuemax', '100'], ],
-        }));
-        this.progressBar = new ProgressBar(progressDiv);
+        })).appendChild(createElement('progress-bar'));
+    }
+    connectedCallback() {
+        this.appendChild(this._content);
+        this.productIcon = this.produces.addSingleProductIcon();
     }
     localize() {
         this.createText.textContent = 'Select an Action';
@@ -483,21 +541,21 @@ class EnchantingMenu extends ContainedComponent {
         this.interval.localize();
         this.autoDisenchantBox.setName('Auto-Disenchant');
         const qualities = ['None', 'Common', 'Uncommon', 'Rare', 'Epic', 'Legendary', 'Mythic'];
-        this.autoDisenchantBox.rewardsDropdown.setButtonText(qualities[this.enchanting.autoDisenchantRewards + 1]);
-        if(this.enchanting.autoDisenchantRewards <= 0) {
+        this.autoDisenchantBox.rewardsDropdown.setButtonText(qualities[game.enchanting.autoDisenchantRewards + 1]);
+        if(game.enchanting.autoDisenchantRewards <= 0) {
             hideElement(this.autoDisenchantBox.rewardsSwitch);
         } else {
             showElement(this.autoDisenchantBox.rewardsSwitch);
         }
-        this.autoDisenchantBox.rewardsSwitch.input.checked = this.enchanting.includeCommonRewards;
+        this.autoDisenchantBox.rewardsSwitch.input.checked = game.enchanting.includeCommonRewards;
 
-        this.autoDisenchantBox.dropsDropdown.setButtonText(qualities[this.enchanting.autoDisenchantDrops + 1]);
-        if(this.enchanting.autoDisenchantDrops <= 0) {
+        this.autoDisenchantBox.dropsDropdown.setButtonText(qualities[game.enchanting.autoDisenchantDrops + 1]);
+        if(game.enchanting.autoDisenchantDrops <= 0) {
             hideElement(this.autoDisenchantBox.dropsSwitch);
         } else {
             showElement(this.autoDisenchantBox.dropsSwitch);
         }
-        this.autoDisenchantBox.dropsSwitch.input.checked = this.enchanting.includeCommonDrops;
+        this.autoDisenchantBox.dropsSwitch.input.checked = game.enchanting.includeCommonDrops;
         this.rerollBox.setName('Select mod to reroll');
     }
     setActionCallback(callback) {
@@ -511,12 +569,12 @@ class EnchantingMenu extends ContainedComponent {
             this.actions.setSelected(action);
             this.createText.textContent = action.actionText;
             this.createButton.textContent = action.name;
-            if(action === this.enchanting.actions.getObjectByID('enchanting:Disenchant')) {
+            if(action === game.enchanting.actions.getObjectByID('enchanting:Disenchant')) {
                 showElement(this.autoDisenchantRow);
             } else {
                 hideElement(this.autoDisenchantRow);
             }
-            if(action === this.enchanting.actions.getObjectByID('enchanting:Reroll')) {
+            if(action === game.enchanting.actions.getObjectByID('enchanting:Reroll')) {
                 showElement(this.rerollRow);
             } else {
                 hideElement(this.rerollRow);
@@ -591,13 +649,28 @@ class EnchantingMenu extends ContainedComponent {
         }
     }
 }
+window.customElements.define('enchanting-menu', EnchantingMenu);
 
-class ItemEnchantIcon extends ItemQtyIcon {
-    constructor(parent) {
-        super(parent);
+class ItemEnchantIcon extends InfoIconElement {
+    constructor() {
+        super();
+        this._content = new DocumentFragment();
+        this._content.append(getTemplateNode('item-enchant-icon-template'));
+        this.container = getElementFromFragment(this._content, 'container', 'div');
+        this.itemImage = getElementFromFragment(this._content, 'item-image', 'img');
+        this.quantity = getElementFromFragment(this._content, 'quantity', 'small');
+        this.tooltipElem = createElement('div', {
+            className: 'text-center'
+        });
     }
-    localize() {
-        this.setTooltip(this.getTooltipContent());
+    setItem(item, quantity, allowQuickBuy=false, altMedia=false) {
+        this.quantity.textContent = numberWithCommas(quantity);
+        this.itemImage.src = altMedia ? item.altMedia : item.media;
+        this.itemQuantity = {
+            item,
+            quantity
+        };
+        this.tooltipElem.textContent = this.getTooltipContent();
     }
     setCallback(callback) {
         this.container.onclick = callback;
@@ -609,21 +682,32 @@ class ItemEnchantIcon extends ItemQtyIcon {
     }
     getTooltipContent() {
         let desc = '';
-        if(this.item !== undefined && this.item.hasDescription)
-            desc = `<br><small class="text-info">${this.item.description}</small>`;
-        if(this.item !== undefined && this.item.specialAttacks.length > 0)
-            desc += `<br><small class="text-info">${getItemSpecialAttackInformation(this.item)}</small>`;
+        if(this.itemQuantity.item !== undefined && this.itemQuantity.item.hasDescription)
+            desc = `<br><small class="text-info">${this.itemQuantity.item.description}</small>`;
+        if(this.itemQuantity.item !== undefined && this.itemQuantity.item.specialAttacks.length > 0)
+            desc += `<br><small class="text-info">${getItemSpecialAttackInformation(this.itemQuantity.item)}</small>`;
         let tt = `<div class="text-center">${this.getName()}${desc}</div>`;
         return tt;
     }
 }
+window.customElements.define('item-enchant-icon', ItemEnchantIcon);
 
-class EnchantingItemSelector extends ContainedComponent {
+class EnchantingItemSelector {
     constructor(enchanting) {
-        super();
-        this.enchanting = enchanting;
         this.parent = document.getElementById('enchanting-item-selector-container');
         this.icons = [];
+    }
+    show() {
+        showElement(this.container);
+    }
+    hide() {
+        hideElement(this.container);
+    }
+    invisible() {
+        this.container.classList.add('invisible');
+    }
+    visible() {
+        this.container.classList.remove('invisible');
     }
     setSelected(item) {
         let old = this.icons.find(icon => icon.container.classList.contains('bg-easy-task'));
@@ -656,21 +740,21 @@ class EnchantingItemSelector extends ContainedComponent {
     updateItem(item) {
         let icon = this.icons.find(i => i.item === item);
         let qty = game.bank.getQty(item);
-        if(qty > 0 && !game.bank.lockedItems.has(item)) {
+        if(qty > 0) {
             if(icon !== undefined) {
                 icon.updateQty();
             } else {
-                if(!this.enchanting.canAugmentItem(item) && !this.enchanting.isAugmentedItem(item))
+                if(!game.enchanting.canAugmentItem(item) && !game.enchanting.isAugmentedItem(item))
                     return;
                 let icon = new ItemEnchantIcon(this.parent);
                 icon.setItem(item, game.bank.getQty(item));
-                icon.setCallback(()=>this.enchanting.selectItemOnClick(item));
-                if(item === this.enchanting.selectedItem)
+                icon.setCallback(()=>game.enchanting.selectItemOnClick(item));
+                if(item === game.enchanting.selectedItem)
                     icon.container.classList.add('bg-easy-task');
                 icon.localize();
                 this.icons.push(icon);
             }
-        } else {
+        } else if (qty === 0) {
             if(icon !== undefined) {
                 icon.destroy();
                 this.icons.splice(this.icons.indexOf(icon), 1);
@@ -680,7 +764,7 @@ class EnchantingItemSelector extends ContainedComponent {
     updateItems() {
         this.destroyIcons();
         let items = game.bank.filterItems(bankItem => {
-            if(!game.bank.lockedItems.has(this.item) && (this.enchanting.canAugmentItem(bankItem.item) || this.enchanting.isAugmentedItem(bankItem.item)))
+            if(game.enchanting.canAugmentItem(bankItem.item) || game.enchanting.isAugmentedItem(bankItem.item))
                 return true;
             return false;
         });
@@ -712,69 +796,15 @@ class EnchantingEquipmentItem extends EquipmentItem {
         this.manager = manager;
         this.game = game;
         this.item = item || game.emptyEquipmentItem;
-
         this.quality = quality;
         this.extraModifiers = rolledMods;
         this.extraSpecials = new Set();
     }
-
-    /* Base Item */
-    set _name(_) { }
-    get _name() {
-        return this.item._name;
+    set tier(_) { }
+    get tier() {
+        return this.item.tier;
     }
-    set _customDescription(_) { }
-    get _customDescription() {
-        return this.item._customDescription;
-    }
-    set category(_) { }
-    get category() {
-        return this.item.category;
-    }
-    set type(_) { }
-    get type() {
-        return this.item.type;
-    }
-    set _media(_) { }
-    get _media() {
-        return this.item._media;
-    }
-    set ignoreCompletion(_) { }
-    get ignoreCompletion() {
-        return true;
-    }
-    set obtainFromItemLog(_) { }
-    get obtainFromItemLog() {
-        return false;
-    }
-    set golbinRaidExclusive(_) { }
-    get golbinRaidExclusive() {
-        return this.item.golbinRaidExclusive;
-    }
-    set _mediaAnimation(_) { }
-    get _mediaAnimation() {
-        return this.item._mediaAnimation;
-    }
-    set _altMedia(_) { }
-    get _altMedia() {
-        return this.item._altMedia;
-    }
-    set sellsFor(_) { }
-    get sellsFor() {
-        return this.item.sellsFor;
-    }
-    set _isArtefact(_) { }
-    get _isArtefact() {
-        return this.item._isArtefact;
-    }
-    set _isGenericArtefact(_) { }
-    get _isGenericArtefact() {
-        return this.item._isGenericArtefact;
-    }
-    set modQuery(_) { }
-    get modQuery() {
-        return this.item.modQuery;
-    }
+    set name(_) { }
     get name() {
         let q;
         switch (this.quality) {
@@ -801,15 +831,72 @@ class EnchantingEquipmentItem extends EquipmentItem {
             name = "Old Modded Content"
         return `${q} ${name}`;
     }
-    get wikiName() {
-        return this.item.wikiName;
+    set category(_) { }
+    get category() {
+        return this.item.category;
     }
+    set type(_) { }
+    get type() {
+        return this.item.type;
+    }
+    set media(_) { }
     get media() {
         return `${this.item.media}#q=${this.quality}`;
     }
+    set altMedia(_) { }
     get altMedia() {
         return this.item.altMedia;
     }
+    set mediaAnimation(_) { }
+    get mediaAnimation() {
+        return this.item.mediaAnimation;
+    }
+    set ignoreCompletion(_) { }
+    get ignoreCompletion() {
+        return true;
+    }
+    set obtainFromItemLog(_) { }
+    get obtainFromItemLog() {
+        return false;
+    }
+    set golbinRaidExclusive(_) { }
+    get golbinRaidExclusive() {
+        return this.item.golbinRaidExclusive;
+    }
+    set sellsFor(_) { }
+    get sellsFor() {
+        return this.item.sellsFor;
+    }
+    set validSlots(_) { }
+    get validSlots() {
+        if(this.item === game.emptyEquipmentItem)
+            return Object.keys(equipmentSlotData);
+        return this.item.validSlots;
+    }
+    set occupiesSlots(_) { }
+    get occupiesSlots() {
+        return this.item.occupiesSlots;
+    }
+    set equipRequirements(_) { }
+    get equipRequirements() {
+        return this.item.equipRequirements;
+    }
+    set scale(_) { }
+    get scale() {
+        let scale = [1, 1.1, 1.2, 1.3, 1.4, 1.5];
+        return scale[this.quality];
+    }
+    set equipmentStats(_) { }
+    get equipmentStats() {
+        let stats = [...this.item.equipmentStats];
+        stats = stats.map(stat => (stat.key !== 'attackSpeed' && stat.key !== 'damageReduction' ? { key: stat.key, value: Math.floor(stat.value * this.scale) } : stat));
+        return stats;
+    }
+    set hasDescription(_) { }
+    get hasDescription() {
+        return this.item.hasDescription || this.modifiers !== undefined;
+    }
+    set description(_) { }
     get description() {
         let description = '';
         if (this.item.hasDescription)
@@ -818,69 +905,35 @@ class EnchantingEquipmentItem extends EquipmentItem {
         if(this.extraModifiers.size > 0) {
             if(description !== '')
                 description += '<br>';
-            let modifierSpans = [];
+            let extraModifiers = {};
             this.extraModifiers.forEach(mod => {
-                try {
-                    if(mod.modifier !== undefined) {
-                        let extraModifiers = {};
-                        extraModifiers[mod.modifier] = mod.value[Math.max(0, this.quality - mod.quality)];
-                        modifierSpans.push(...formatModifiers((desc,textClass)=>{
-                            textClass = `text-enchanting-quality-${this.quality}`;
-                            return `<span class="${textClass}">${desc.text}</span>`;
-                        }, game.getModifierValuesFromData(extraModifiers), 1, 1))
-                    }
-                    if(mod.combatEffect !== undefined) {
-                        let effects = [{ ...mod.combatEffect, chance: mod.value[Math.max(0, this.quality - mod.quality)] }];
-                        let combatEffects = game.getCombatEffectApplicatorsWithTriggersFromData(effects);
-                        modifierSpans.push(...combatEffects.map(effect => {
-                            let { text } = effect.getDescription();
-                            return `<span class="text-enchanting-quality-${this.quality}">${text}</span>`;
-                        }));
-                    }
-                } catch(e) {
-                    modifierSpans.push(`<span class="text-enchanting-quality-${this.quality}">${mod._localID}</span>`);
-                }
-            }); 
+                extraModifiers[mod._localID] = mod.value[Math.max(0, this.quality - mod.quality)];
+            });
+            let modifierSpans = formatModifiers((desc,textClass)=>{
+                textClass = `text-enchanting-quality-${this.quality}`;
+                return `<span class="${textClass}">${desc}</span>`;
+            }, extraModifiers, 1, 1);
             description += joinAsLineBreakList(modifierSpans);
         }
         return description;
     }
-    get modifiedDescription() {
-        if (this._modifiedDescription !== undefined)
-            return this._modifiedDescription;
-        let desc = applyDescriptionModifications(this.description);
-        if (this.isArtefact) {
-            desc += desc.length > 0 ? '<br>' : '';
-            desc += `${this.artefactSizeAndLocation}`;
+    set modifiers(_) { }
+    get modifiers() {
+        let modifiers;
+        if(this.item.modifiers !== undefined)
+            modifiers = { ...this.item.modifiers };
+        if(this.extraModifiers.size > 0) {
+            if(modifiers === undefined)
+                modifiers = {};
+            this.extraModifiers.forEach(mod => {
+                modifiers[mod._localID] = (modifiers[mod._localID] !== undefined ? modifiers[mod._localID] : 0) + mod.value[Math.max(0, this.quality - mod.quality)];
+            });
         }
-        if (this.isGenericArtefact && setLang == 'en') {
-            desc += desc.length > 0 ? '<br>' : '';
-            desc += `This is a Generic Artefact.`;
-        }
-        this._modifiedDescription = desc;
-        return this._modifiedDescription;
+        return modifiers;
     }
-    get artefactSizeAndLocation() {
-        return this.item.artefactSizeAndLocation;
-    }
-    get hasDescription() {
-        return this.item.hasDescription || this.modifiers !== undefined;
-    }
-    get isArtefact() {
-        return this.item.isArtefact;
-    }
-    get isGenericArtefact() {
-        return this.item.isGenericArtefact;
-    }
-
-    /* Base Equipment */
-    set cantEquipWith(_) { }
-    get cantEquipWith() {
-        return this.item.cantEquipWith;
-    }
-    set equipRequirements(_) { }
-    get equipRequirements() {
-        return this.item.equipRequirements;
+    set enemyModifiers(_) { }
+    get enemyModifiers() {
+        return this.item.enemyModifiers;
     }
     set conditionalModifiers(_) { }
     get conditionalModifiers() {
@@ -898,112 +951,9 @@ class EnchantingEquipmentItem extends EquipmentItem {
     get providedRunes() {
         return this.item.providedRunes;
     }
-    set deathPenaltyPriority(_) { }
-    get deathPenaltyPriority() {
-        return this.item.deathPenaltyPriority;
-    }
-    set tier(_) { }
-    get tier() {
-        return this.item.tier;
-    }
-    set validSlots(_) { }
-    get validSlots() {
-        if(this.item === game.emptyEquipmentItem)
-            return game.equipmentSlots.allObjects;
-        return this.item.validSlots;
-    }
-    set occupiesSlots(_) { }
-    get occupiesSlots() {
-        return this.item.occupiesSlots;
-    }
-    set equipmentStats(_) { }
-    get equipmentStats() {
-        let stats = [...this.item.equipmentStats];
-        stats = stats.map(stat => {
-            if(stat.key !== 'attackSpeed' && stat.key !== 'resistance') {
-                return { key: stat.key, value: Math.floor(stat.value * this.scale) }
-            }
-            else {
-                return stat
-            }
-        });
-        return stats;
-    }
-    set combatEffects(_) { }
-    get combatEffects() {
-        let combatEffects;
-        if(this.item.combatEffects !== undefined)
-            combatEffects = [ ...this.item.combatEffects ];
-        if(this.extraModifiers.size > 0) {
-            if(combatEffects === undefined)
-                combatEffects = [];
-
-            this.extraModifiers.forEach(mod => {
-                if(mod.combatEffect !== undefined) {
-                    let effects = [{ ...mod.combatEffect, chance: mod.value[Math.max(0, this.quality - mod.quality)] }];
-                    try {
-                        combatEffects.push(...game.getCombatEffectApplicatorsWithTriggersFromData(effects))
-                    } catch(e) {
-                        console.log(`${mod._localID} failed to load`);
-                    }
-                }
-            });
-        }
-        return combatEffects;
-    }
-    
-    set modifiers(_) { }
-    get modifiers() {
-        let modifiers;
-        if(this.item.modifiers !== undefined)
-            modifiers = [ ...this.item.modifiers ];
-        if(this.extraModifiers.size > 0) {
-            if(modifiers === undefined)
-                modifiers = [];
-            this.extraModifiers.forEach(mod => {
-                if(mod.modifier !== undefined) {
-                    let mods = [];
-                    mods[mod.modifier] = mod.value[Math.max(0, this.quality - mod.quality)];
-                    try {
-                        modifiers.push(...game.getModifierValuesFromData(mods))
-                    } catch(e) {
-                        console.log(`${mod._localID} failed to load`);
-                    }
-                }
-            });
-        }
-        return modifiers;
-    }
-    set enemyModifiers(_) { }
-    get enemyModifiers() {
-        return this.item.enemyModifiers;
-    }
     set ammoType(_) { }
     get ammoType() {
         return this.item.ammoType;
-    }
-    set consumesOn(_) { }
-    get consumesOn() {
-        return this.item.consumesOn;
-    }
-    set consumesChargesOn(_) { }
-    get consumesChargesOn() {
-        return this.item.consumesChargesOn;
-    }
-    set consumesItemOn(_) { }
-    get consumesItemOn() {
-        return this.item.consumesItemOn;
-    }
-
-    set scale(_) { }
-    get scale() {
-        let scale = [1, 1.1, 1.2, 1.3, 1.4, 1.5];
-        return scale[this.quality];
-    }
-    get baseItem() {
-        if(this.item.baseItem !== undefined)
-            this.item.baseItem;
-        return this.item;
     }
 
     encode(writer) {
@@ -1021,7 +971,9 @@ class EnchantingEquipmentItem extends EquipmentItem {
             this._postLoadID = this.item;
             this.item = game.emptyEquipmentItem;
         }
-        this.extraModifiers = reader.getSet(readNamespacedReject(game.enchanting.mods));
+        this.extraModifiers = reader.getSet((reader) => {
+            return reader.getNamespacedObject(game.enchanting.mods);
+        });
     }
 }
 
@@ -1051,64 +1003,11 @@ class EnchantingWeaponItem extends WeaponItem {
         this.extraModifiers = rolledMods;
         this.extraSpecials = rolledSpecials;
     }
-
-    /* Base Item */
-    set _name(_) { }
-    get _name() {
-        return this.item._name;
+    set tier(_) { }
+    get tier() {
+        return this.item.tier;
     }
-    set _customDescription(_) { }
-    get _customDescription() {
-        return this.item._customDescription;
-    }
-    set category(_) { }
-    get category() {
-        return this.item.category;
-    }
-    set type(_) { }
-    get type() {
-        return this.item.type;
-    }
-    set _media(_) { }
-    get _media() {
-        return this.item._media;
-    }
-    set ignoreCompletion(_) { }
-    get ignoreCompletion() {
-        return true;
-    }
-    set obtainFromItemLog(_) { }
-    get obtainFromItemLog() {
-        return false;
-    }
-    set golbinRaidExclusive(_) { }
-    get golbinRaidExclusive() {
-        return this.item.golbinRaidExclusive;
-    }
-    set _mediaAnimation(_) { }
-    get _mediaAnimation() {
-        return this.item._mediaAnimation;
-    }
-    set _altMedia(_) { }
-    get _altMedia() {
-        return this.item._altMedia;
-    }
-    set sellsFor(_) { }
-    get sellsFor() {
-        return this.item.sellsFor;
-    }
-    set _isArtefact(_) { }
-    get _isArtefact() {
-        return this.item._isArtefact;
-    }
-    set _isGenericArtefact(_) { }
-    get _isGenericArtefact() {
-        return this.item._isGenericArtefact;
-    }
-    set modQuery(_) { }
-    get modQuery() {
-        return this.item.modQuery;
-    }
+    set name(_) { }
     get name() {
         let q;
         switch (this.quality) {
@@ -1135,16 +1034,82 @@ class EnchantingWeaponItem extends WeaponItem {
             name = "Old Modded Content"
         return `${q} ${name}`;
     }
-    get wikiName() {
-        return this.item.wikiName;
+    set category(_) { }
+    get category() {
+        return this.item.category;
     }
+    set type(_) { }
+    get type() {
+        return this.item.type;
+    }
+    set media(_) { }
     get media() {
         return `${this.item.media}#q=${this.quality}`;
     }
+    set altMedia(_) { }
     get altMedia() {
         return this.item.altMedia;
     }
-
+    set mediaAnimation(_) { }
+    get mediaAnimation() {
+        return this.item.mediaAnimation;
+    }
+    set ignoreCompletion(_) { }
+    get ignoreCompletion() {
+        return true;
+    }
+    set obtainFromItemLog(_) { }
+    get obtainFromItemLog() {
+        return false;
+    }
+    set golbinRaidExclusive(_) { }
+    get golbinRaidExclusive() {
+        return this.item.golbinRaidExclusive;
+    }
+    set sellsFor(_) { }
+    get sellsFor() {
+        return this.item.sellsFor;
+    }
+    set validSlots(_) { }
+    get validSlots() {
+        if(this.item === game.emptyEquipmentItem)
+            return Object.keys(equipmentSlotData);
+        return this.item.validSlots;
+    }
+    set occupiesSlots(_) { }
+    get occupiesSlots() {
+        return this.item.occupiesSlots;
+    }
+    set equipRequirements(_) { }
+    get equipRequirements() {
+        return this.item.equipRequirements;
+    }
+    set scale(_) { }
+    get scale() {
+        let scale = [1, 1.1, 1.2, 1.3, 1.4, 1.5];
+        return scale[this.quality];
+    }
+    set equipmentStats(_) { }
+    get equipmentStats() {
+        let stats = [...this.item.equipmentStats];
+        stats = stats.map(stat => (stat.key !== 'attackSpeed' && stat.key !== 'damageReduction' ? { key: stat.key, value: Math.floor(stat.value * this.scale) } : stat));
+        return stats;
+    }
+    set attackType(_) { }
+    get attackType() {
+        if(this.item === game.emptyEquipmentItem)
+            return 'melee';
+        return this.item.attackType;
+    }
+    set ammoTypeRequired(_) { }
+    get ammoTypeRequired() {
+        return this.item.ammoTypeRequired;
+    }
+    set hasDescription(_) { }
+    get hasDescription() {
+        return this.item.hasDescription || this.modifiers !== undefined;
+    }
+    set description(_) { }
     get description() {
         let description = '';
         if (this.item.hasDescription)
@@ -1153,69 +1118,35 @@ class EnchantingWeaponItem extends WeaponItem {
         if(this.extraModifiers.size > 0) {
             if(description !== '')
                 description += '<br>';
-            let modifierSpans = [];
+            let extraModifiers = {};
             this.extraModifiers.forEach(mod => {
-                try {
-                    if(mod.modifier !== undefined) {
-                        let extraModifiers = {};
-                        extraModifiers[mod.modifier] = mod.value[Math.max(0, this.quality - mod.quality)];
-                        modifierSpans.push(...formatModifiers((desc,textClass)=>{
-                            textClass = `text-enchanting-quality-${this.quality}`;
-                            return `<span class="${textClass}">${desc.text}</span>`;
-                        }, game.getModifierValuesFromData(extraModifiers), 1, 1))
-                    }
-                    if(mod.combatEffect !== undefined) {
-                        let effects = [{ ...mod.combatEffect, chance: mod.value[Math.max(0, this.quality - mod.quality)] }];
-                        let combatEffects = game.getCombatEffectApplicatorsWithTriggersFromData(effects);
-                        modifierSpans.push(...combatEffects.map(effect => {
-                            let { text } = effect.getDescription();
-                            return `<span class="text-enchanting-quality-${this.quality}">${text}</span>`;
-                        }));
-                    }
-                } catch(e) {
-                    modifierSpans.push(`<span class="text-enchanting-quality-${this.quality}">${mod._localID}</span>`);
-                }
-            }); 
+                extraModifiers[mod._localID] = mod.value[Math.max(0, this.quality - mod.quality)];
+            });
+            let modifierSpans = formatModifiers((desc,textClass)=>{
+                textClass = `text-enchanting-quality-${this.quality}`;
+                return `<span class="${textClass}">${desc}</span>`;
+            }, extraModifiers, 1, 1);
             description += joinAsLineBreakList(modifierSpans);
         }
         return description;
     }
-    get modifiedDescription() {
-        if (this._modifiedDescription !== undefined)
-            return this._modifiedDescription;
-        let desc = applyDescriptionModifications(this.description);
-        if (this.isArtefact) {
-            desc += desc.length > 0 ? '<br>' : '';
-            desc += `${this.artefactSizeAndLocation}`;
+    set modifiers(_) { }
+    get modifiers() {
+        let modifiers;
+        if(this.item.modifiers !== undefined)
+            modifiers = { ...this.item.modifiers };
+        if(this.extraModifiers.size > 0) {
+            if(modifiers === undefined)
+                modifiers = {};
+            this.extraModifiers.forEach(mod => {
+                modifiers[mod._localID] = (modifiers[mod._localID] !== undefined ? modifiers[mod._localID] : 0) + mod.value[Math.max(0, this.quality - mod.quality)];
+            });
         }
-        if (this.isGenericArtefact && setLang == 'en') {
-            desc += desc.length > 0 ? '<br>' : '';
-            desc += `This is a Generic Artefact.`;
-        }
-        this._modifiedDescription = desc;
-        return this._modifiedDescription;
+        return modifiers;
     }
-    get artefactSizeAndLocation() {
-        return this.item.artefactSizeAndLocation;
-    }
-    get hasDescription() {
-        return this.item.hasDescription || this.modifiers !== undefined;
-    }
-    get isArtefact() {
-        return this.item.isArtefact;
-    }
-    get isGenericArtefact() {
-        return this.item.isGenericArtefact;
-    }
-
-    /* Base Equipment */
-    set cantEquipWith(_) { }
-    get cantEquipWith() {
-        return this.item.cantEquipWith;
-    }
-    set equipRequirements(_) { }
-    get equipRequirements() {
-        return this.item.equipRequirements;
+    set enemyModifiers(_) { }
+    get enemyModifiers() {
+        return this.item.enemyModifiers;
     }
     set conditionalModifiers(_) { }
     get conditionalModifiers() {
@@ -1240,7 +1171,7 @@ class EnchantingWeaponItem extends WeaponItem {
             if(overrideSpecialChances === undefined)
                 overrideSpecialChances = [];
 
-            let defaultChances = this.specialAttacks.map((attack, i) => {
+            let defaultChances = this.item.specialAttacks.map((attack, i) => {
                 return overrideSpecialChances[i] || attack.defaultChance;
             });
 
@@ -1248,7 +1179,16 @@ class EnchantingWeaponItem extends WeaponItem {
                 return special.chance[Math.max(0, this.quality - special.quality)];
             });
 
+            //let totalDefault = defaultChances.reduce((sum, val) => sum + val, 0);
+
+            //let totalExtra = extraChances.reduce((sum, val) => sum + val, 0);
+
+            //if(totalDefault + totalExtra > 100) {
+            //    let rescaledDefaults = defaultChances.map(chance => chance / (totalDefault / (totalDefault - totalExtra)));
+            //    overrideSpecialChances = [...rescaledDefaults, ...extraChances];
+            //} else {
             overrideSpecialChances = [...defaultChances, ...extraChances];
+            //}
         }
         return overrideSpecialChances;
     }
@@ -1256,130 +1196,9 @@ class EnchantingWeaponItem extends WeaponItem {
     get providedRunes() {
         return this.item.providedRunes;
     }
-    set deathPenaltyPriority(_) { }
-    get deathPenaltyPriority() {
-        return this.item.deathPenaltyPriority;
-    }
-    set tier(_) { }
-    get tier() {
-        return this.item.tier;
-    }
-    set validSlots(_) { }
-    get validSlots() {
-        if(this.item === game.emptyEquipmentItem)
-            return game.equipmentSlots.allObjects;
-        return this.item.validSlots;
-    }
-    set occupiesSlots(_) { }
-    get occupiesSlots() {
-        return this.item.occupiesSlots;
-    }
-    set equipmentStats(_) { }
-    get equipmentStats() {
-        let stats = [...this.item.equipmentStats];
-        stats = stats.map(stat => {
-            if(stat.key !== 'attackSpeed' && stat.key !== 'resistance') {
-                return { key: stat.key, value: Math.floor(stat.value * this.scale) }
-            }
-            else {
-                return stat
-            }
-        });
-        return stats;
-    }
-    set combatEffects(_) { }
-    get combatEffects() {
-        let combatEffects;
-        if(this.item.combatEffects !== undefined)
-            combatEffects = [ ...this.item.combatEffects ];
-        if(this.extraModifiers.size > 0) {
-            if(combatEffects === undefined)
-                combatEffects = [];
-
-            this.extraModifiers.forEach(mod => {
-                if(mod.combatEffect !== undefined) {
-                    let effects = [{ ...mod.combatEffect, chance: mod.value[Math.max(0, this.quality - mod.quality)] }];
-                    try {
-                        combatEffects.push(...game.getCombatEffectApplicatorsWithTriggersFromData(effects))
-                    } catch(e) {
-                        console.log(`${mod._localID} failed to load`);
-                    }
-                }
-            });
-        }
-        return combatEffects;
-    }
-    
-    set modifiers(_) { }
-    get modifiers() {
-        let modifiers;
-        if(this.item.modifiers !== undefined)
-            modifiers = [ ...this.item.modifiers ];
-        if(this.extraModifiers.size > 0) {
-            if(modifiers === undefined)
-                modifiers = [];
-            this.extraModifiers.forEach(mod => {
-                if(mod.modifier !== undefined) {
-                    let mods = [];
-                    mods[mod.modifier] = mod.value[Math.max(0, this.quality - mod.quality)];
-                    try {
-                        modifiers.push(...game.getModifierValuesFromData(mods))
-                    } catch(e) {
-                        console.log(`${mod._localID} failed to load`);
-                    }
-                }
-            });
-        }
-        return modifiers;
-    }
-    set enemyModifiers(_) { }
-    get enemyModifiers() {
-        return this.item.enemyModifiers;
-    }
     set ammoType(_) { }
     get ammoType() {
         return this.item.ammoType;
-    }
-    set consumesOn(_) { }
-    get consumesOn() {
-        return this.item.consumesOn;
-    }
-    set consumesChargesOn(_) { }
-    get consumesChargesOn() {
-        return this.item.consumesChargesOn;
-    }
-    set consumesItemOn(_) { }
-    get consumesItemOn() {
-        return this.item.consumesItemOn;
-    }
-    /* Base Weapon */
-    set attackType(_) { }
-    get attackType() {
-        if(this.item === game.emptyEquipmentItem)
-            return 'melee';
-        return this.item.attackType;
-    }
-    set damageType(_) { }
-    get damageType() {
-        if(this.item === game.emptyEquipmentItem)
-            return game.normalDamage;
-        return this.item.damageType;
-    }
-    set ammoTypeRequired(_) { }
-    get ammoTypeRequired() {
-        return this.item.ammoTypeRequired;
-    }
-
-    set scale(_) { }
-    get scale() {
-        let scale = [1, 1.1, 1.2, 1.3, 1.4, 1.5];
-        return scale[this.quality];
-    }
-
-    get baseItem() {
-        if(this.item.baseItem !== undefined)
-            this.item.baseItem;
-        return this.item;
     }
 
     encode(writer) {
@@ -1400,8 +1219,12 @@ class EnchantingWeaponItem extends WeaponItem {
             this._postLoadID = this.item;
             this.item = game.emptyEquipmentItem;
         }
-        this.extraModifiers = reader.getSet(readNamespacedReject(game.enchanting.mods));
-        this.extraSpecials = reader.getSet(readNamespacedReject(game.enchanting.specials));
+        this.extraModifiers = reader.getSet((reader) => {
+            return reader.getNamespacedObject(game.enchanting.mods);
+        });
+        this.extraSpecials = reader.getSet((reader) => {
+            return reader.getNamespacedObject(game.enchanting.specials);
+        });
     }
 }
 
@@ -1426,64 +1249,11 @@ class EnchantingUpgradedEquipmentItemWrapper extends EquipmentItem {
         this.item = item;
         this.upgradedItem = upgradedItem;
     }
-
-    /* Base Item */
-    set _name(_) { }
-    get _name() {
-        return this.upgradedItem._name;
+    set tier(_) { }
+    get tier() {
+        return this.upgradedItem.tier;
     }
-    set _customDescription(_) { }
-    get _customDescription() {
-        return this.upgradedItem._customDescription;
-    }
-    set category(_) { }
-    get category() {
-        return this.upgradedItem.category;
-    }
-    set type(_) { }
-    get type() {
-        return this.upgradedItem.type;
-    }
-    set _media(_) { }
-    get _media() {
-        return this.upgradedItem._media;
-    }
-    set ignoreCompletion(_) { }
-    get ignoreCompletion() {
-        return true;
-    }
-    set obtainFromItemLog(_) { }
-    get obtainFromItemLog() {
-        return false;
-    }
-    set golbinRaidExclusive(_) { }
-    get golbinRaidExclusive() {
-        return this.upgradedItem.golbinRaidExclusive;
-    }
-    set _mediaAnimation(_) { }
-    get _mediaAnimation() {
-        return this.upgradedItem._mediaAnimation;
-    }
-    set _altMedia(_) { }
-    get _altMedia() {
-        return this.upgradedItem._altMedia;
-    }
-    set sellsFor(_) { }
-    get sellsFor() {
-        return this.upgradedItem.sellsFor;
-    }
-    set _isArtefact(_) { }
-    get _isArtefact() {
-        return this.upgradedItem._isArtefact;
-    }
-    set _isGenericArtefact(_) { }
-    get _isGenericArtefact() {
-        return this.upgradedItem._isGenericArtefact;
-    }
-    set modQuery(_) { }
-    get modQuery() {
-        return this.upgradedItem.modQuery;
-    }
+    set name(_) { }
     get name() {
         let q;
         switch (this.item.quality) {
@@ -1510,15 +1280,70 @@ class EnchantingUpgradedEquipmentItemWrapper extends EquipmentItem {
             name = "Old Modded Content"
         return `${q} ${name}`;
     }
-    get wikiName() {
-        return this.upgradedItem.wikiName;
+    set category(_) { }
+    get category() {
+        return this.upgradedItem.category;
     }
+    set type(_) { }
+    get type() {
+        return this.upgradedItem.type;
+    }
+    set media(_) { }
     get media() {
         return `${this.upgradedItem.media}#q=${this.item.quality}`;
     }
+    set altMedia(_) { }
     get altMedia() {
         return this.upgradedItem.altMedia;
     }
+    set mediaAnimation(_) { }
+    get mediaAnimation() {
+        return this.upgradedItem.mediaAnimation;
+    }
+    set ignoreCompletion(_) { }
+    get ignoreCompletion() {
+        return true;
+    }
+    set obtainFromItemLog(_) { }
+    get obtainFromItemLog() {
+        return false;
+    }
+    set golbinRaidExclusive(_) { }
+    get golbinRaidExclusive() {
+        return this.upgradedItem.golbinRaidExclusive;
+    }
+    set sellsFor(_) { }
+    get sellsFor() {
+        return this.upgradedItem.sellsFor;
+    }
+    set validSlots(_) { }
+    get validSlots() {
+        return this.upgradedItem.validSlots;
+    }
+    set occupiesSlots(_) { }
+    get occupiesSlots() {
+        return this.upgradedItem.occupiesSlots;
+    }
+    set equipRequirements(_) { }
+    get equipRequirements() {
+        return this.upgradedItem.equipRequirements;
+    }
+    set scale(_) { }
+    get scale() {
+        let scale = [1, 1.1, 1.2, 1.3, 1.4, 1.5];
+        return scale[this.item.quality];
+    }
+    set equipmentStats(_) { }
+    get equipmentStats() {
+        let stats = [...this.upgradedItem.equipmentStats];
+        stats = stats.map(stat => (stat.key !== 'attackSpeed' && stat.key !== 'damageReduction' ? { key: stat.key, value: Math.floor(stat.value * this.scale) } : stat));
+        return stats;
+    }
+    set hasDescription(_) { }
+    get hasDescription() {
+        return this.upgradedItem.hasDescription;
+    }
+    set description(_) { }
     get description() {
         let description = '';
         if (this.upgradedItem.hasDescription)
@@ -1527,69 +1352,35 @@ class EnchantingUpgradedEquipmentItemWrapper extends EquipmentItem {
         if(this.item.extraModifiers.size > 0) {
             if(description !== '')
                 description += '<br>';
-            let modifierSpans = [];
+            let extraModifiers = {};
             this.item.extraModifiers.forEach(mod => {
-                try {
-                    if(mod.modifier !== undefined) {
-                        let mods = {};
-                        mods[mod.modifier] = mod.value[Math.max(0, this.quality - mod.quality)];
-                        modifierSpans.push(...formatModifiers((desc,textClass)=>{
-                            textClass = `text-enchanting-quality-${this.quality}`;
-                            return `<span class="${textClass}">${desc.text}</span>`;
-                        }, game.getModifierValuesFromData(mods), 1, 1))
-                    }
-                    if(mod.combatEffect !== undefined) {
-                        let effects = [{ ...mod.combatEffect, chance: mod.value[Math.max(0, this.quality - mod.quality)] }];
-                        let combatEffects = game.getCombatEffectApplicatorsWithTriggersFromData(effects);
-                        modifierSpans.push(...combatEffects.map(effect => {
-                            let { text } = effect.getDescription();
-                            return `<span class="text-enchanting-quality-${this.quality}">${text}</span>`;
-                        }));
-                    }
-                } catch(e) {
-                    modifierSpans.push(`<span class="text-enchanting-quality-${this.quality}">${mod._localID}</span>`);
-                }
-            }); 
+                extraModifiers[mod._localID] = mod.value[Math.max(0, this.item.quality - mod.quality)];
+            });
+            let modifierSpans = formatModifiers((desc,textClass)=>{
+                textClass = `text-enchanting-quality-${this.item.quality}`;
+                return `<span class="${textClass}">${desc}</span>`;
+            }, extraModifiers, 1, 1);
             description += joinAsLineBreakList(modifierSpans);
         }
         return description;
     }
-    get modifiedDescription() {
-        if (this._modifiedDescription !== undefined)
-            return this._modifiedDescription;
-        let desc = applyDescriptionModifications(this.description);
-        if (this.isArtefact) {
-            desc += desc.length > 0 ? '<br>' : '';
-            desc += `${this.artefactSizeAndLocation}`;
+    set modifiers(_) { }
+    get modifiers() {
+        let modifiers;
+        if(this.upgradedItem.modifiers !== undefined)
+            modifiers = { ...this.upgradedItem.modifiers };
+        if(this.item.extraModifiers.size > 0) {
+            if(modifiers === undefined)
+                modifiers = {};
+            this.item.extraModifiers.forEach(mod => {
+                modifiers[mod._localID] = (modifiers[mod._localID] !== undefined ? modifiers[mod._localID] : 0) + mod.value[Math.max(0, this.item.quality - mod.quality)];
+            });
         }
-        if (this.isGenericArtefact && setLang == 'en') {
-            desc += desc.length > 0 ? '<br>' : '';
-            desc += `This is a Generic Artefact.`;
-        }
-        this._modifiedDescription = desc;
-        return this._modifiedDescription;
+        return modifiers;
     }
-    get artefactSizeAndLocation() {
-        return this.upgradedItem.artefactSizeAndLocation;
-    }
-    get hasDescription() {
-        return this.upgradedItem.hasDescription || this.upgradedItem.modifiers !== undefined;
-    }
-    get isArtefact() {
-        return this.upgradedItem.isArtefact;
-    }
-    get isGenericArtefact() {
-        return this.upgradedItem.isGenericArtefact;
-    }
-
-    /* Base Equipment */
-    set cantEquipWith(_) { }
-    get cantEquipWith() {
-        return this.upgradedItem.cantEquipWith;
-    }
-    set equipRequirements(_) { }
-    get equipRequirements() {
-        return this.upgradedItem.equipRequirements;
+    set enemyModifiers(_) { }
+    get enemyModifiers() {
+        return this.upgradedItem.enemyModifiers;
     }
     set conditionalModifiers(_) { }
     get conditionalModifiers() {
@@ -1607,112 +1398,9 @@ class EnchantingUpgradedEquipmentItemWrapper extends EquipmentItem {
     get providedRunes() {
         return this.upgradedItem.providedRunes;
     }
-    set deathPenaltyPriority(_) { }
-    get deathPenaltyPriority() {
-        return this.upgradedItem.deathPenaltyPriority;
-    }
-    set tier(_) { }
-    get tier() {
-        return this.upgradedItem.tier;
-    }
-    set validSlots(_) { }
-    get validSlots() {
-        if(this.upgradedItem === game.emptyEquipmentItem)
-            return game.equipmentSlots.allObjects;
-        return this.upgradedItem.validSlots;
-    }
-    set occupiesSlots(_) { }
-    get occupiesSlots() {
-        return this.upgradedItem.occupiesSlots;
-    }
-    set equipmentStats(_) { }
-    get equipmentStats() {
-        let stats = [...this.upgradedItem.equipmentStats];
-        stats = stats.map(stat => {
-            if(stat.key !== 'attackSpeed' && stat.key !== 'resistance') {
-                return { key: stat.key, value: Math.floor(stat.value * this.scale) }
-            }
-            else {
-                return stat
-            }
-        });
-        return stats;
-    }
-    set combatEffects(_) { }
-    get combatEffects() {
-        let combatEffects;
-        if(this.upgradedItem.combatEffects !== undefined)
-            combatEffects = [ ...this.upgradedItem.combatEffects ];
-        if(this.item.extraModifiers.size > 0) {
-            if(combatEffects === undefined)
-                combatEffects = [];
-
-            this.item.extraModifiers.forEach(mod => {
-                if(mod.combatEffect !== undefined) {
-                    let effects = [{ ...mod.combatEffect, chance: mod.value[Math.max(0, this.quality - mod.quality)] }];
-                    try {
-                        combatEffects.push(...game.getCombatEffectApplicatorsWithTriggersFromData(effects))
-                    } catch(e) {
-                        console.log(`${mod._localID} failed to load`);
-                    }
-                }
-            });
-        }
-        return combatEffects;
-    }
-    
-    set modifiers(_) { }
-    get modifiers() {
-        let modifiers;
-        if(this.upgradedItem.modifiers !== undefined)
-            modifiers = [ ...this.upgradedItem.modifiers ];
-        if(this.item.extraModifiers.size > 0) {
-            if(modifiers === undefined)
-                modifiers = [];
-            this.item.extraModifiers.forEach(mod => {
-                if(mod.modifier !== undefined) {
-                    let mods = [];
-                    mods[mod.modifier] = mod.value[Math.max(0, this.quality - mod.quality)];
-                    try {
-                        modifiers.push(...game.getModifierValuesFromData(mods))
-                    } catch(e) {
-                        console.log(`${mod._localID} failed to load`);
-                    }
-                }
-            });
-        }
-        return modifiers;
-    }
-    set enemyModifiers(_) { }
-    get enemyModifiers() {
-        return this.upgradedItem.enemyModifiers;
-    }
     set ammoType(_) { }
     get ammoType() {
         return this.upgradedItem.ammoType;
-    }
-    set consumesOn(_) { }
-    get consumesOn() {
-        return this.upgradedItem.consumesOn;
-    }
-    set consumesChargesOn(_) { }
-    get consumesChargesOn() {
-        return this.upgradedItem.consumesChargesOn;
-    }
-    set consumesItemOn(_) { }
-    get consumesItemOn() {
-        return this.upgradedItem.consumesItemOn;
-    }
-
-    set scale(_) { }
-    get scale() {
-        let scale = [1, 1.1, 1.2, 1.3, 1.4, 1.5];
-        return scale[this.item.quality];
-    }
-    get baseItem() {
-        if(this.upgradedItem.baseItem !== undefined)
-            this.upgradedItem.baseItem;
-        return this.upgradedItem;
     }
 }
 
@@ -1738,64 +1426,11 @@ class EnchantingUpgradedWeaponItemWrapper extends WeaponItem {
         this.item = item;
         this.upgradedItem = upgradedItem;
     }
-
-    /* Base Item */
-    set _name(_) { }
-    get _name() {
-        return this.upgradedItem._name;
+    set tier(_) { }
+    get tier() {
+        return this.upgradedItem.tier;
     }
-    set _customDescription(_) { }
-    get _customDescription() {
-        return this.upgradedItem._customDescription;
-    }
-    set category(_) { }
-    get category() {
-        return this.upgradedItem.category;
-    }
-    set type(_) { }
-    get type() {
-        return this.upgradedItem.type;
-    }
-    set _media(_) { }
-    get _media() {
-        return this.upgradedItem._media;
-    }
-    set ignoreCompletion(_) { }
-    get ignoreCompletion() {
-        return true;
-    }
-    set obtainFromItemLog(_) { }
-    get obtainFromItemLog() {
-        return false;
-    }
-    set golbinRaidExclusive(_) { }
-    get golbinRaidExclusive() {
-        return this.upgradedItem.golbinRaidExclusive;
-    }
-    set _mediaAnimation(_) { }
-    get _mediaAnimation() {
-        return this.upgradedItem._mediaAnimation;
-    }
-    set _altMedia(_) { }
-    get _altMedia() {
-        return this.upgradedItem._altMedia;
-    }
-    set sellsFor(_) { }
-    get sellsFor() {
-        return this.upgradedItem.sellsFor;
-    }
-    set _isArtefact(_) { }
-    get _isArtefact() {
-        return this.upgradedItem._isArtefact;
-    }
-    set _isGenericArtefact(_) { }
-    get _isGenericArtefact() {
-        return this.upgradedItem._isGenericArtefact;
-    }
-    set modQuery(_) { }
-    get modQuery() {
-        return this.upgradedItem.modQuery;
-    }
+    set name(_) { }
     get name() {
         let q;
         switch (this.item.quality) {
@@ -1822,15 +1457,78 @@ class EnchantingUpgradedWeaponItemWrapper extends WeaponItem {
             name = "Old Modded Content"
         return `${q} ${name}`;
     }
-    get wikiName() {
-        return this.upgradedItem.wikiName;
+    set category(_) { }
+    get category() {
+        return this.upgradedItem.category;
     }
+    set type(_) { }
+    get type() {
+        return this.upgradedItem.type;
+    }
+    set media(_) { }
     get media() {
         return `${this.upgradedItem.media}#q=${this.item.quality}`;
     }
+    set altMedia(_) { }
     get altMedia() {
         return this.upgradedItem.altMedia;
     }
+    set mediaAnimation(_) { }
+    get mediaAnimation() {
+        return this.upgradedItem.mediaAnimation;
+    }
+    set ignoreCompletion(_) { }
+    get ignoreCompletion() {
+        return true;
+    }
+    set obtainFromItemLog(_) { }
+    get obtainFromItemLog() {
+        return false;
+    }
+    set golbinRaidExclusive(_) { }
+    get golbinRaidExclusive() {
+        return this.upgradedItem.golbinRaidExclusive;
+    }
+    set sellsFor(_) { }
+    get sellsFor() {
+        return this.upgradedItem.sellsFor;
+    }
+    set validSlots(_) { }
+    get validSlots() {
+        return this.upgradedItem.validSlots;
+    }
+    set occupiesSlots(_) { }
+    get occupiesSlots() {
+        return this.upgradedItem.occupiesSlots;
+    }
+    set equipRequirements(_) { }
+    get equipRequirements() {
+        return this.upgradedItem.equipRequirements;
+    }
+    set scale(_) { }
+    get scale() {
+        let scale = [1, 1.1, 1.2, 1.3, 1.4, 1.5];
+        return scale[this.item.quality];
+    }
+    set equipmentStats(_) { }
+    get equipmentStats() {
+        let stats = [...this.upgradedItem.equipmentStats];
+        stats = stats.map(stat => (stat.key !== 'attackSpeed' && stat.key !== 'damageReduction' ? { key: stat.key, value: Math.floor(stat.value * this.scale) } : stat));
+        return stats;
+    }
+    set attackType(_) { }
+    get attackType() {
+        return this.upgradedItem.attackType;
+    }
+    set ammoTypeRequired(_) { }
+    get ammoTypeRequired() {
+        return this.upgradedItem.ammoTypeRequired;
+    }
+    set hasDescription(_) { }
+    get hasDescription() {
+        return this.upgradedItem.hasDescription;
+    }
+    set description(_) { }
     get description() {
         let description = '';
         if (this.upgradedItem.hasDescription)
@@ -1839,69 +1537,35 @@ class EnchantingUpgradedWeaponItemWrapper extends WeaponItem {
         if(this.item.extraModifiers.size > 0) {
             if(description !== '')
                 description += '<br>';
-            let modifierSpans = [];
+            let extraModifiers = {};
             this.item.extraModifiers.forEach(mod => {
-                try {
-                    if(mod.modifier !== undefined) {
-                        let mods = {};
-                        mods[mod.modifier] = mod.value[Math.max(0, this.quality - mod.quality)];
-                        modifierSpans.push(...formatModifiers((desc,textClass)=>{
-                            textClass = `text-enchanting-quality-${this.quality}`;
-                            return `<span class="${textClass}">${desc.text}</span>`;
-                        }, game.getModifierValuesFromData(mods), 1, 1))
-                    }
-                    if(mod.combatEffect !== undefined) {
-                        let effects = [{ ...mod.combatEffect, chance: mod.value[Math.max(0, this.quality - mod.quality)] }];
-                        let combatEffects = game.getCombatEffectApplicatorsWithTriggersFromData(effects);
-                        modifierSpans.push(...combatEffects.map(effect => {
-                            let { text } = effect.getDescription();
-                            return `<span class="text-enchanting-quality-${this.quality}">${text}</span>`;
-                        }));
-                    }
-                } catch(e) {
-                    modifierSpans.push(`<span class="text-enchanting-quality-${this.quality}">${mod._localID}</span>`);
-                }
-            }); 
+                extraModifiers[mod._localID] = mod.value[Math.max(0, this.item.quality - mod.quality)];
+            });
+            let modifierSpans = formatModifiers((desc,textClass)=>{
+                textClass = `text-enchanting-quality-${this.item.quality}`;
+                return `<span class="${textClass}">${desc}</span>`;
+            }, extraModifiers, 1, 1);
             description += joinAsLineBreakList(modifierSpans);
         }
         return description;
     }
-    get modifiedDescription() {
-        if (this._modifiedDescription !== undefined)
-            return this._modifiedDescription;
-        let desc = applyDescriptionModifications(this.description);
-        if (this.isArtefact) {
-            desc += desc.length > 0 ? '<br>' : '';
-            desc += `${this.artefactSizeAndLocation}`;
+    set modifiers(_) { }
+    get modifiers() {
+        let modifiers;
+        if(this.upgradedItem.modifiers !== undefined)
+            modifiers = { ...this.upgradedItem.modifiers };
+        if(this.item.extraModifiers.size > 0) {
+            if(modifiers === undefined)
+                modifiers = {};
+            this.item.extraModifiers.forEach(mod => {
+                modifiers[mod._localID] = (modifiers[mod._localID] !== undefined ? modifiers[mod._localID] : 0) + mod.value[Math.max(0, this.item.quality - mod.quality)];
+            });
         }
-        if (this.isGenericArtefact && setLang == 'en') {
-            desc += desc.length > 0 ? '<br>' : '';
-            desc += `This is a Generic Artefact.`;
-        }
-        this._modifiedDescription = desc;
-        return this._modifiedDescription;
+        return modifiers;
     }
-    get artefactSizeAndLocation() {
-        return this.upgradedItem.artefactSizeAndLocation;
-    }
-    get hasDescription() {
-        return this.upgradedItem.hasDescription || this.upgradedItem.modifiers !== undefined;
-    }
-    get isArtefact() {
-        return this.upgradedItem.isArtefact;
-    }
-    get isGenericArtefact() {
-        return this.upgradedItem.isGenericArtefact;
-    }
-
-    /* Base Equipment */
-    set cantEquipWith(_) { }
-    get cantEquipWith() {
-        return this.upgradedItem.cantEquipWith;
-    }
-    set equipRequirements(_) { }
-    get equipRequirements() {
-        return this.upgradedItem.equipRequirements;
+    set enemyModifiers(_) { }
+    get enemyModifiers() {
+        return this.upgradedItem.enemyModifiers;
     }
     set conditionalModifiers(_) { }
     get conditionalModifiers() {
@@ -1909,9 +1573,9 @@ class EnchantingUpgradedWeaponItemWrapper extends WeaponItem {
     }
     set specialAttacks(_) { }
     get specialAttacks() {
-        let specials = [...this.item.specialAttacks];
-        if(this.extraSpecials.size > 0) {
-            let extraSpecials = [...this.extraSpecials].map(special => special.specialAttacks[Math.max(0, this.quality - special.quality)]);
+        let specials = [...this.upgradedItem.specialAttacks];
+        if(this.item.extraSpecials.size > 0) {
+            let extraSpecials = [...this.item.extraSpecials].map(special => special.specialAttacks[Math.max(0, this.item.quality - special.quality)]);
             specials = specials.concat(extraSpecials);
         }
         return specials;
@@ -1919,19 +1583,19 @@ class EnchantingUpgradedWeaponItemWrapper extends WeaponItem {
     set overrideSpecialChances(_) { }
     get overrideSpecialChances() {
         let overrideSpecialChances;
-        if(this.item.overrideSpecialChances !== undefined)
-            overrideSpecialChances = [...this.item.overrideSpecialChances];
+        if(this.upgradedItem.overrideSpecialChances !== undefined)
+            overrideSpecialChances = [...this.upgradedItem.overrideSpecialChances];
         
-        if(this.extraSpecials.size > 0) {
+        if(this.item.extraSpecials.size > 0) {
             if(overrideSpecialChances === undefined)
                 overrideSpecialChances = [];
 
-            let defaultChances = this.specialAttacks.map((attack, i) => {
+            let defaultChances = this.upgradedItem.specialAttacks.map((attack, i) => {
                 return overrideSpecialChances[i] || attack.defaultChance;
             });
 
-            let extraChances = [...this.extraSpecials].map(special => {
-                return special.chance[Math.max(0, this.quality - special.quality)];
+            let extraChances = [...this.item.extraSpecials].map(special => {
+                return special.chance[Math.max(0, this.item.quality - special.quality)];
             });
 
             overrideSpecialChances = [...defaultChances, ...extraChances];
@@ -1942,129 +1606,9 @@ class EnchantingUpgradedWeaponItemWrapper extends WeaponItem {
     get providedRunes() {
         return this.upgradedItem.providedRunes;
     }
-    set deathPenaltyPriority(_) { }
-    get deathPenaltyPriority() {
-        return this.upgradedItem.deathPenaltyPriority;
-    }
-    set tier(_) { }
-    get tier() {
-        return this.upgradedItem.tier;
-    }
-    set validSlots(_) { }
-    get validSlots() {
-        if(this.upgradedItem === game.emptyEquipmentItem)
-            return game.equipmentSlots.allObjects;
-        return this.upgradedItem.validSlots;
-    }
-    set occupiesSlots(_) { }
-    get occupiesSlots() {
-        return this.upgradedItem.occupiesSlots;
-    }
-    set equipmentStats(_) { }
-    get equipmentStats() {
-        let stats = [...this.upgradedItem.equipmentStats];
-        stats = stats.map(stat => {
-            if(stat.key !== 'attackSpeed' && stat.key !== 'resistance') {
-                return { key: stat.key, value: Math.floor(stat.value * this.scale) }
-            }
-            else {
-                return stat
-            }
-        });
-        return stats;
-    }
-    set combatEffects(_) { }
-    get combatEffects() {
-        let combatEffects;
-        if(this.upgradedItem.combatEffects !== undefined)
-            combatEffects = [ ...this.upgradedItem.combatEffects ];
-        if(this.item.extraModifiers.size > 0) {
-            if(combatEffects === undefined)
-                combatEffects = [];
-
-            this.item.extraModifiers.forEach(mod => {
-                if(mod.combatEffect !== undefined) {
-                    let effects = [{ ...mod.combatEffect, chance: mod.value[Math.max(0, this.quality - mod.quality)] }];
-                    try {
-                        combatEffects.push(...game.getCombatEffectApplicatorsWithTriggersFromData(effects))
-                    } catch(e) {
-                        console.log(`${mod._localID} failed to load`);
-                    }
-                }
-            });
-        }
-        return combatEffects;
-    }
-    
-    set modifiers(_) { }
-    get modifiers() {
-        let modifiers;
-        if(this.upgradedItem.modifiers !== undefined)
-            modifiers = [ ...this.upgradedItem.modifiers ];
-        if(this.item.extraModifiers.size > 0) {
-            if(modifiers === undefined)
-                modifiers = [];
-            this.item.extraModifiers.forEach(mod => {
-                if(mod.modifier !== undefined) {
-                    let mods = [];
-                    mods[mod.modifier] = mod.value[Math.max(0, this.quality - mod.quality)];
-                    try {
-                        modifiers.push(...game.getModifierValuesFromData(mods))
-                    } catch(e) {
-                        console.log(`${mod._localID} failed to load`);
-                    }
-                }
-            });
-        }
-        return modifiers;
-    }
-    set enemyModifiers(_) { }
-    get enemyModifiers() {
-        return this.upgradedItem.enemyModifiers;
-    }
     set ammoType(_) { }
     get ammoType() {
         return this.upgradedItem.ammoType;
-    }
-    set consumesOn(_) { }
-    get consumesOn() {
-        return this.upgradedItem.consumesOn;
-    }
-    set consumesChargesOn(_) { }
-    get consumesChargesOn() {
-        return this.upgradedItem.consumesChargesOn;
-    }
-    set consumesItemOn(_) { }
-    get consumesItemOn() {
-        return this.upgradedItem.consumesItemOn;
-    }
-    set attackType(_) { }
-    get attackType() {
-        if(this.item === game.emptyEquipmentItem)
-            return 'melee';
-        return this.item.attackType;
-    }
-    set damageType(_) { }
-    get damageType() {
-        if(this.item === game.emptyEquipmentItem)
-            return game.normalDamage;
-        return this.item.damageType;
-    }
-    set ammoTypeRequired(_) { }
-    get ammoTypeRequired() {
-        return this.item.ammoTypeRequired;
-    }
-
-    set scale(_) { }
-    get scale() {
-        let scale = [1, 1.1, 1.2, 1.3, 1.4, 1.5];
-        return scale[this.quality];
-    }
-
-    get baseItem() {
-        if(this.item.baseItem !== undefined)
-            this.item.baseItem;
-        return this.item;
     }
 }
 
@@ -2116,10 +1660,6 @@ class EnchantingMod extends NamespacedObject {
         this.quality = data.quality;
         this.value = data.value;
         this.level = data.level;
-        if(data.modifier !== undefined)
-            this.modifier = data.modifier;
-        if(data.combatEffect !== undefined)
-            this.combatEffect = data.combatEffect;
     }
 }
 
@@ -2529,6 +2069,13 @@ class Enchanting extends Skill {
             xp /= 2;
         return xp;
     }
+
+    getFlatIntervalModifier(action) {
+        return (this.game.modifiers.getSkillModifierValue('increasedSkillInterval', this) - this.game.modifiers.getSkillModifierValue('decreasedSkillInterval', this));
+    }
+    getPercentageIntervalModifier(action) {
+        return (this.game.modifiers.getSkillModifierValue('increasedSkillIntervalPercent', this) - this.game.modifiers.getSkillModifierValue('decreasedSkillIntervalPercent', this) + this.game.modifiers.increasedGlobalSkillIntervalPercent - this.game.modifiers.decreasedGlobalSkillIntervalPercent);
+    }
     modifyInterval(interval, action) {
         const flatModifier = this.getFlatIntervalModifier(action);
         const percentModifier = this.getPercentageIntervalModifier(action);
@@ -2856,6 +2403,11 @@ class Enchanting extends Skill {
                 }
             });
         }
+
+        if(game.softDataRegQueue.length > 0) {
+            game.softDataRegQueue.forEach(([data,object])=>object.registerSoftDependencies(data, game));
+            game.softDataRegQueue = [];
+        }
     }
 
     handleMissingObject(namespacedID) {
@@ -3012,19 +2564,19 @@ class Enchanting extends Skill {
 
     canAugmentItem(item) {
         const bannedSlots = ['Consumable', 'Summon1', 'Summon2', 'Gem', 'Quiver'];
-        return (item.constructor === EquipmentItem || item.constructor === WeaponItem) && item !== game.emptyEquipmentItem && !item.validSlots.some(slot => bannedSlots.includes(slot._localID))
+        return (item.constructor === EquipmentItem || item.constructor === WeaponItem) && item !== game.emptyEquipmentItem && !item.validSlots.some(slot => bannedSlots.includes(slot))
     }
 
     isAugmentedItem(item) {
-        return item !== undefined && (item.constructor === EnchantingEquipmentItem || item.constructor === EnchantingWeaponItem);
+        return item.constructor === EnchantingEquipmentItem || item.constructor === EnchantingWeaponItem;
     }
 
     isAugmentedWeapon(item) {
-        return item !== undefined && item.constructor === EnchantingWeaponItem;
+        return item.constructor === EnchantingWeaponItem;
     }
 
     isAugmentedArmour(item) {
-        return item !== undefined && item.constructor === EnchantingEquipmentItem;
+        return item.constructor === EnchantingEquipmentItem;
     }
 
     checkForItem(item) {
@@ -3032,7 +2584,7 @@ class Enchanting extends Skill {
 
         let isInCombatLoot = game.combat.loot.drops.filter(item => isItemOrProxied(item)).length > 0;
         let isInBank = this.game.bank.filterItems((bankItem) => isItemOrProxied(bankItem.item)).length > 0;
-        let isInEquipment = this.game.combat.player.equipmentSets.some(({equipment})=> equipment.equippedArray.some(slot => isItemOrProxied(slot.item)));
+        let isInEquipment = this.game.combat.player.equipmentSets.some(({equipment})=> equipment.slotArray.some(slot => isItemOrProxied(slot.item)));
         return isInBank || isInEquipment || isInCombatLoot;
     }
 
@@ -3076,18 +2628,18 @@ class Enchanting extends Skill {
         this.equipment.forEach(item => {
             if(item.occupiesSlots.length > 0) {
                 game.combat.player.equipmentSets.forEach(({equipment}) => {
-                    equipment.equippedArray.forEach(slot => {
-                        if(slot.item === item && slot.occupiedBy === undefined) {
+                    equipment.slotArray.forEach(slot => {
+                        if(slot.item === item && slot.occupiedBy === 'None') {
                             slot.setEquipped(item, slot.quantity, item.occupiesSlots);
-                            item.occupiesSlots.forEach((slotType)=>equipment.equippedItems[slotType.id].setOccupied(item, slot.slot));
+                            item.occupiesSlots.forEach((slotType)=>equipment.slots[slotType].setOccupied(item, slot.type));
                             this.game.combat.player.renderQueue.equipment = true;
                         }
                     });
                 })
             }
             this.makeUpgrades(item);
-        });
-        game.combat.computeAllStats();
+        })
+        game.combat.player.computeAllStats();
 
         if(game.currentGamemode.allowDungeonLevelCapIncrease === true && !this.isUnlocked)
             this.setUnlock(true);
@@ -3098,8 +2650,8 @@ class Enchanting extends Skill {
     }
 
     initMenus() {
-        this.menu = new EnchantingMenu(this);
-        this.itemSelector = new EnchantingItemSelector(this);
+        this.menu = new EnchantingMenu();
+        this.itemSelector = new EnchantingItemSelector();
     }
 
     registerData(namespace, data) {
@@ -3159,10 +2711,15 @@ class Enchanting extends Skill {
             reader.getArray((reader) => {
                 let value = reader.getNamespacedObject(this.equipment);
                 console.log(`Got ${value.id}, decoding`);
-                if(value)
-                    value.decode(reader);
+                value.decode(reader);
                 return value;
             });
+
+            if(game.softDataRegQueue.length > 0) {
+                game.softDataRegQueue.forEach(([data,object])=>object.registerSoftDependencies(data, game));
+                game.softDataRegQueue = [];
+            }
+
             this.actionTimer.decode(reader, version);
             if (reader.getBoolean()) {
                 const selectedItem = reader.getNamespacedObject(this.game.items);

@@ -1,0 +1,161 @@
+<template id="enchanting-page-component">
+  <div class="content d-none" id="enchanting-container">
+    <div class="skill-info">
+      <skill-header data-skill-id="enchanting:Enchanting"></skill-header>
+    </div>
+    <div class="row row-deck gutters-tiny">
+      <div class="col-12">
+        <div id="page" class="block block-rounded border-top border-success border-4x p-3">
+          <div class="row no-gutters">
+            <div class="col-12 col-md-4" id="enchanting-menu-container"></div>
+            <div class="col-12 col-md-8">
+              <div class="block-content block-content-full">
+                <div class="row no-gutters" id="enchanting-item-selector-container"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="reroll-radio-template">
+  <div class="custom-control custom-radio mb-1 mx-2">
+    <input class="custom-control-input pointer-enabled" type="radio" id="input">
+    <label class="custom-control-label pointer-enabled font-w400" id="label"></label>
+  </div>
+</template>
+
+<template id="enchanting-action-icon-template">
+  <div id="container" class="btn-light pointer-enabled m-2 info-icon">
+    <img class="p-2" id="item-image">
+  </div>
+</template>
+
+<template id="enchanting-action-icons-template" data-image-init="true">
+  <span id="empty-text"></span>
+</template>
+
+<template id="enchanting-actions-box-template">
+  <h5 class="font-w600 mb-1 text-center">Actions</h5>
+  <enchanting-actions-icons id="icons"></enchanting-actions-icons>
+</template>
+
+<template id="enchanting-menu-template">
+  <div class="col-12 px-0">
+    <div class="block-content block-content-full">
+      <div class="row gutters-tiny">
+        <div class="col-12">
+          <div class="row row-deck gutters-tiny">
+            <div class="col-4">
+              <div class="block block-rounded-double bg-combat-inner-dark text-center p-3">
+                <img class="bank-img-detail" id="product-image">
+                <div style="position:absolute;left:0;bottom:10px;width:100%;">
+                  <small class="font-w600 badge-pill bg-secondary m-1 text-white" id="product-quantity">-</small>
+                </div>
+              </div>
+            </div>
+            <div class="col-8">
+              <div class="block block-rounded-double bg-combat-inner-dark pt-2 pl-2 pr-2 pb-1">
+                <h5 class="font-size-sm font-w600 text-muted m-1">
+                  <small>
+                    <lang-string lang-id="MENU_TEXT_CREATE"></lang-string>
+                  </small>
+                </h5>
+                <h5 class="font-w700 text-left text-combat-smoke m-1">
+                  <span id="product-name">-</span>
+                </h5>
+                <h5 class="font-w400 font-size-sm text-left text-bank-desc m-1 mb-2">
+                  <small id="product-description"></small>
+                </h5>
+                <h5 class="font-w400 font-size-sm text-left text-bank-desc m-1 mb-2">
+                  <small id="selected-text">
+                    <lang-string lang-id="MENU_TEXT_NONE_SELECTED"></lang-string>
+                  </small>
+                </h5>
+                <h5 class="font-w400 font-size-sm text-left combat-action m-1 mb-2 pointer-enabled d-none"
+                  id="view-stats-text">
+                  <lang-string lang-id="MENU_TEXT_VIEW_STATS"></lang-string>
+                </h5>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 block block-rounded-double bg-combat-inner-dark">
+            <div class="row no-gutters">
+              <div class="col-md-2"></div>
+              <div class="col-12 col-md-8">
+                <enchanting-actions-box id="actions"></enchanting-actions-box>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 block block-rounded-double bg-combat-inner-dark">
+            <div class="row no-gutters">
+              <div class="col-md-2"></div>
+              <div class="col-12 col-md-8">
+                <auto-disenchant-box id="disenchant"></auto-disenchant-box>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 block block-rounded-double bg-combat-inner-dark pt-2 pb-1 text-center">
+            <div class="row no-gutters">
+              <produces-box class="col-12 col-sm-6 pb-2 icon-size-48" id="produces"></produces-box>
+              <grants-box class="col-12 col-sm-6 pb-2 icon-size-48" id="grants"></grants-box>
+            </div>
+          </div>
+          <div class="col-12 block block-rounded-double bg-combat-inner-dark p-3 text-center">
+            <div class="row justify-content-center icon-size-48">
+              <div>
+                <button class="btn btn-success m-2 p-2" type="button" style="height: 48px;" id="create-button">
+                  <lang-string lang-id="MENU_TEXT_CREATE"></lang-string>
+                </button>
+              </div>
+              <interval-icon id="interval"></interval-icon>
+              <div class="col-12">
+                <progress-bar class="progress-height-5" id="progress-bar"></progress-bar>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+
+<template id="auto-disenchant-box-template">
+  <h5 class="font-w600 font-size-sm mb-1 text-center">Auto-Disenchant</h5>
+  <div class="row no-gutters justify-content-center">
+    <div class="col-6 pt-1 text-center">
+      <h5 class="font-w600 font-size-sm mb-1 text-center">Crafting Rewards</h5>
+    </div>
+    <div class="col-6 pt-1 text-center">
+      <h5 class="font-w600 font-size-sm mb-1 text-center">Non-Crafting Drops</h5>
+    </div>
+    <div class="col-6 pb-1 text-center">
+      <div class="dropdown"><button class="btn dropdown-toggle btn-sm btn-primary" type="button" data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false" id="auto-disenchant-rewards-dropdown">Mythic</button>
+        <div class="dropdown-menu font-size-sm overflow-y-auto" aria-labelledby="auto-disenchant-rewards-dropdown"
+          style="max-height: 60vh;z-index:1000;"></div>
+      </div>
+    </div>
+    <div class="col-6 pb-1 text-center">
+      <div class="dropdown"><button class="btn dropdown-toggle btn-sm btn-primary" type="button" data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false" id="auto-disenchant-drops-dropdown">None</button>
+        <div class="dropdown-menu font-size-sm overflow-y-auto" aria-labelledby="auto-disenchant-drops-dropdown"
+          style="max-height: 60vh;z-index:1000;"></div>
+      </div>
+    </div>
+    <div id="rewardsSwitchContainer" class="col-6 pb-1 text-center"></div>
+    <div id="dropsSwitchContainer" class="col-6 pb-1 text-center"></div>
+  </div>
+</template>
+
+<template id="item-enchant-icon-template">
+  <div id="container" class="btn-light pointer-enabled m-2 info-icon">
+    <img class="p-2" id="item-image">
+    <div class="font-size-sm text-white text-center">
+      <small class="badge-pill bg-secondary" id="quantity"></small>
+    </div>
+  </div>
+</template>
