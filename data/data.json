@@ -736,7 +736,7 @@
                 "armour"
               ],
               "quality": 4,
-              "modifier": "resistance",
+              "modifier": "flatResistance",
               "value": [
                 [{
                   "damageTypeID": "melvorD:Normal",
