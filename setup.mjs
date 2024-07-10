@@ -1,4 +1,4 @@
-export async function setup({ characterStorage, gameData, patch, loadTemplates, loadStylesheet, loadModule, onInterfaceAvailable, onCharacterLoaded }) {
+export async function setup({ characterStorage, gameData, patch, loadTemplates, loadStylesheet, loadModule, onModsLoaded, onInterfaceAvailable, onCharacterLoaded }) {
     if(typeof getUnlockedAtNodes === 'undefined') {
         function getUnlockedAtNodes(skill, level) {
             const unlockText = templateLangString('MENU_TEXT_UNLOCKED_AT', {
@@ -1232,36 +1232,8 @@ export async function setup({ characterStorage, gameData, patch, loadTemplates, 
     console.log("Registering Enchanting Data");
     await gameData.addPackage('data/data.json');
 
-    if(cloudManager.hasAoDEntitlementAndIsEnabled) {
+    if(cloudManager.hasAoDEntitlementAndIsEnabled)
         await gameData.addPackage('data/data-aod.json');
-
-        const levelCapIncreases = ['enchanting:Pre99Dungeons', 'enchanting:ImpendingDarknessSet100'];
-
-        if(cloudManager.hasTotHEntitlementAndIsEnabled) {
-            levelCapIncreases.push(...['enchanting:Post99Dungeons', 'enchanting:ThroneOfTheHeraldSet120']);
-        }
-
-        await gameData.addPackage({
-            $schema: '',
-            namespace: 'enchanting',
-            modifications: {
-                gamemodes: [
-                    {
-                        id: 'melvorAoD:AncientRelics',
-                        levelCapIncreases: {
-                            add: levelCapIncreases
-                        }
-                    }
-                ]
-            }
-        });
-    }
-    
-    patch(EventManager, 'loadEvents').after(() => {
-        if(game.currentGamemode.startingSkills !== undefined && game.currentGamemode.startingSkills.has(game.enchanting)) {
-            game.enchanting.setUnlock(true);
-        }
-    });
 
     console.log('Registered Enchanting Data.');
 
@@ -1375,6 +1347,52 @@ export async function setup({ characterStorage, gameData, patch, loadTemplates, 
             return game.enchanting.handleMissingObject(id);
         }
         return obj;
+    });
+
+    onModsLoaded(async () => {
+        if(cloudManager.hasAoDEntitlementAndIsEnabled) {
+            const levelCapIncreases = ['enchanting:Pre99Dungeons', 'enchanting:ImpendingDarknessSet100'];
+
+            if(cloudManager.hasTotHEntitlementAndIsEnabled) {
+                levelCapIncreases.push(...['enchanting:Post99Dungeons', 'enchanting:ThroneOfTheHeraldSet120']);
+            }
+
+            const gamemodes = game.gamemodes.filter(gamemode => gamemode.defaultInitialLevelCap !== undefined && gamemode.levelCapIncreases.length > 0 && gamemode.useDefaultSkillUnlockRequirements === true && gamemode.allowSkillUnlock === false);
+
+            await gameData.addPackage({
+                $schema: '',
+                namespace: 'enchanting',
+                modifications: {
+                    gamemodes: gamemodes.map(gamemode => ({
+                        id: gamemode.id,
+                        levelCapIncreases: {
+                            add: levelCapIncreases
+                        },
+                        startingSkills: {
+                            add: ['enchanting:Enchanting']
+                        },
+                        skillUnlockRequirements: [
+                            {
+                                skillID: 'enchanting:Enchanting',
+                                requirements: [
+                                    {
+                                        type: 'SkillLevel',
+                                        skillID: 'melvorD:Attack',
+                                        level: 1
+                                    }
+                                ]
+                            }
+                        ]
+                    }))
+                }
+            });
+        }
+    
+        patch(EventManager, 'loadEvents').after(() => {
+            if(game.currentGamemode.startingSkills !== undefined && game.currentGamemode.startingSkills.has(game.enchanting)) {
+                game.enchanting.setUnlock(true);
+            }
+        });
     });
 
     onCharacterLoaded(async () => {

@@ -260,30 +260,6 @@
       }
     ]
   },
-  "modifications": {
-    "gamemodes": [
-      {
-        "id": "melvorAoD:AncientRelics",
-        "startingSkills": {
-          "add": [
-            "enchanting:Enchanting"
-          ]
-        },
-        "skillUnlockRequirements": [
-          {
-            "skillID": "enchanting:Enchanting",
-            "requirements": [
-              {
-                "type": "SkillLevel",
-                "skillID": "melvorD:Attack",
-                "level": 1
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  },
   "dependentData": [
     {
       "namespace": "melvorTotH",
