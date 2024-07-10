@@ -118,6 +118,36 @@ class AutoDisenchantBox extends ContainedComponent {
         this.dropsSwitch.setAttribute('data-size', 'small');
         this.dropsSwitchCont.append(this.dropsSwitch);
 
+        this.downgradeRewardsSwitchCont = createElement('div', {
+            classList: ['col-6', 'pb-1', 'text-center'],
+            parent: this.iconContainer,
+        });
+        this.downgradeRewardsSwitch = new SettingsSwitchElement();
+        this.downgradeRewardsSwitch.initialize({
+            currentValue: this.enchanting.downgradeRewards,
+            name: "Downgrade to Common"
+        },
+        () => {
+            this.enchanting.downgradeRewards = this.downgradeRewardsSwitch.input.checked;
+        });
+        this.downgradeRewardsSwitch.setAttribute('data-size', 'small');
+        this.downgradeRewardsSwitchCont.append(this.downgradeRewardsSwitch);
+
+        this.downgradeDropsSwitchCont = createElement('div', {
+            classList: ['col-6', 'pb-1', 'text-center'],
+            parent: this.iconContainer,
+        });
+        this.downgradeDropsSwitch = new SettingsSwitchElement();
+        this.downgradeDropsSwitch.initialize({
+            currentValue: this.enchanting.downgradeDrops,
+            name: "Downgrade to Common"
+        },
+        () => {
+            this.enchanting.downgradeDrops = this.downgradeDropsSwitch.input.checked;
+        });
+        this.downgradeDropsSwitch.setAttribute('data-size', 'small');
+        this.downgradeDropsSwitchCont.append(this.downgradeDropsSwitch);
+
 
         parent.append(this.container);
     }
@@ -159,8 +189,10 @@ class AutoDisenchantBox extends ContainedComponent {
                 rewardsCallback(i-1);
                 if(i <= 1) {
                     hideElement(this.rewardsSwitch);
+                    hideElement(this.downgradeRewardsSwitch);
                 } else {
                     showElement(this.rewardsSwitch);
+                    showElement(this.downgradeRewardsSwitch);
                 }
             });
             this.dropsDropdown.addOption([qualityDropsContainer], () => {
@@ -168,8 +200,10 @@ class AutoDisenchantBox extends ContainedComponent {
                 dropsCallback(i-1);
                 if(i <= 1) {
                     hideElement(this.dropsSwitch);
+                    hideElement(this.downgradeDropsSwitch);
                 } else {
                     showElement(this.dropsSwitch);
+                    showElement(this.downgradeDropsSwitch);
                 }
             });
         });
@@ -240,17 +274,27 @@ class RerollBox extends ContainedComponent {
     }
     updateMod(item, mod, index) {
         if(mod !== undefined) {
-            let mods = {};
-            mods[mod.modifier] = mod.value[Math.max(0, item.quality - mod.quality)];
-            let modifierSpans;
+            let modifierSpans = [];
             
             try {
-                modifierSpans = formatModifiers((desc,textClass)=>{
-                    textClass = `text-enchanting-quality-${this.quality}`;
-                    return `<span class="${textClass}">${desc.text}</span>`;
-                }, game.getModifierValuesFromData(mods), 1, 1);
+                if(mod.modifier !== undefined) {
+                    let extraModifiers = {};
+                    extraModifiers[mod.modifier] = mod.value[Math.max(0, item.quality - mod.quality)];
+                    modifierSpans.push(...formatModifiers((desc,textClass)=>{
+                        textClass = `text-enchanting-quality-${item.quality}`;
+                        return `<span class="${textClass}">${desc.text}</span>`;
+                    }, game.getModifierValuesFromData(extraModifiers), 1, 1))
+                }
+                if(mod.combatEffect !== undefined) {
+                    let effects = [{ ...mod.combatEffect, chance: mod.value[Math.max(0, item.quality - mod.quality)] }];
+                    let combatEffects = game.getCombatEffectApplicatorsWithTriggersFromData(effects);
+                    modifierSpans.push(...combatEffects.map(effect => {
+                        let { text } = effect.getDescription();
+                        return `<span class="text-enchanting-quality-${item.quality}">${text}</span>`;
+                    }));
+                }
             } catch(e) {
-                modifierSpans =  [`<span class="text-enchanting-quality-${this.quality}">${mod._localID}</span>`];
+                modifierSpans.push(`<span class="text-enchanting-quality-${item.quality}">${mod._localID}</span>`);
             }
 
             let modSpan = `<small>${modifierSpans[0]}</small>`;
@@ -486,18 +530,24 @@ class EnchantingMenu extends ContainedComponent {
         this.autoDisenchantBox.rewardsDropdown.setButtonText(qualities[this.enchanting.autoDisenchantRewards + 1]);
         if(this.enchanting.autoDisenchantRewards <= 0) {
             hideElement(this.autoDisenchantBox.rewardsSwitch);
+            hideElement(this.autoDisenchantBox.downgradeRewardsSwitch);
         } else {
             showElement(this.autoDisenchantBox.rewardsSwitch);
+            showElement(this.autoDisenchantBox.downgradeRewardsSwitch);
         }
         this.autoDisenchantBox.rewardsSwitch.input.checked = this.enchanting.includeCommonRewards;
+        this.autoDisenchantBox.downgradeRewardsSwitch.input.checked = this.enchanting.downgradeRewards;
 
         this.autoDisenchantBox.dropsDropdown.setButtonText(qualities[this.enchanting.autoDisenchantDrops + 1]);
         if(this.enchanting.autoDisenchantDrops <= 0) {
             hideElement(this.autoDisenchantBox.dropsSwitch);
+            hideElement(this.autoDisenchantBox.downgradeDropsSwitch);
         } else {
             showElement(this.autoDisenchantBox.dropsSwitch);
+            showElement(this.autoDisenchantBox.downgradeDropsSwitch);
         }
         this.autoDisenchantBox.dropsSwitch.input.checked = this.enchanting.includeCommonDrops;
+        this.autoDisenchantBox.downgradeDropsSwitch.input.checked = this.enchanting.downgradeDrops;
         this.rerollBox.setName('Select mod to reroll');
     }
     setActionCallback(callback) {
@@ -1532,22 +1582,22 @@ class EnchantingUpgradedEquipmentItemWrapper extends EquipmentItem {
                 try {
                     if(mod.modifier !== undefined) {
                         let mods = {};
-                        mods[mod.modifier] = mod.value[Math.max(0, this.quality - mod.quality)];
+                        mods[mod.modifier] = mod.value[Math.max(0, this.item.quality - mod.quality)];
                         modifierSpans.push(...formatModifiers((desc,textClass)=>{
-                            textClass = `text-enchanting-quality-${this.quality}`;
+                            textClass = `text-enchanting-quality-${this.item.quality}`;
                             return `<span class="${textClass}">${desc.text}</span>`;
                         }, game.getModifierValuesFromData(mods), 1, 1))
                     }
                     if(mod.combatEffect !== undefined) {
-                        let effects = [{ ...mod.combatEffect, chance: mod.value[Math.max(0, this.quality - mod.quality)] }];
+                        let effects = [{ ...mod.combatEffect, chance: mod.value[Math.max(0, this.item.quality - mod.quality)] }];
                         let combatEffects = game.getCombatEffectApplicatorsWithTriggersFromData(effects);
                         modifierSpans.push(...combatEffects.map(effect => {
                             let { text } = effect.getDescription();
-                            return `<span class="text-enchanting-quality-${this.quality}">${text}</span>`;
+                            return `<span class="text-enchanting-quality-${this.item.quality}">${text}</span>`;
                         }));
                     }
                 } catch(e) {
-                    modifierSpans.push(`<span class="text-enchanting-quality-${this.quality}">${mod._localID}</span>`);
+                    modifierSpans.push(`<span class="text-enchanting-quality-${this.item.quality}">${mod._localID}</span>`);
                 }
             }); 
             description += joinAsLineBreakList(modifierSpans);
@@ -1844,22 +1894,22 @@ class EnchantingUpgradedWeaponItemWrapper extends WeaponItem {
                 try {
                     if(mod.modifier !== undefined) {
                         let mods = {};
-                        mods[mod.modifier] = mod.value[Math.max(0, this.quality - mod.quality)];
+                        mods[mod.modifier] = mod.value[Math.max(0, this.item.quality - mod.quality)];
                         modifierSpans.push(...formatModifiers((desc,textClass)=>{
-                            textClass = `text-enchanting-quality-${this.quality}`;
+                            textClass = `text-enchanting-quality-${this.item.quality}`;
                             return `<span class="${textClass}">${desc.text}</span>`;
                         }, game.getModifierValuesFromData(mods), 1, 1))
                     }
                     if(mod.combatEffect !== undefined) {
-                        let effects = [{ ...mod.combatEffect, chance: mod.value[Math.max(0, this.quality - mod.quality)] }];
+                        let effects = [{ ...mod.combatEffect, chance: mod.value[Math.max(0, this.item.quality - mod.quality)] }];
                         let combatEffects = game.getCombatEffectApplicatorsWithTriggersFromData(effects);
                         modifierSpans.push(...combatEffects.map(effect => {
                             let { text } = effect.getDescription();
-                            return `<span class="text-enchanting-quality-${this.quality}">${text}</span>`;
+                            return `<span class="text-enchanting-quality-${this.item.quality}">${text}</span>`;
                         }));
                     }
                 } catch(e) {
-                    modifierSpans.push(`<span class="text-enchanting-quality-${this.quality}">${mod._localID}</span>`);
+                    modifierSpans.push(`<span class="text-enchanting-quality-${this.item.quality}">${mod._localID}</span>`);
                 }
             }); 
             description += joinAsLineBreakList(modifierSpans);
@@ -2084,8 +2134,7 @@ class EnchantingItemUpgrade {
                 this.itemCosts.push({ item, quantity });
             }
         });
-        this.gpCost = itemUpgrade.gpCost;
-        this.scCost = itemUpgrade.scCost;
+        this.currencyCosts = [...itemUpgrade.currencyCosts];
         this.rootItems = [];
         
         itemUpgrade.rootItems.forEach(root => {
@@ -2243,8 +2292,10 @@ class Enchanting extends Skill {
         this.actionTimer = new Timer('Skill', () => this.action());
         this.shouldResetAction = false;
         this.includeCommonDrops = false;
+        this.downgradeDrops = false;
         this.autoDisenchantDrops = -1;
         this.includeCommonRewards = false;
+        this.downgradeRewards = false;
         this.autoDisenchantRewards = -1;
 
         this.dropWeights = this.generateWeights(3);
@@ -2414,6 +2465,10 @@ class Enchanting extends Skill {
 
     executeReroll() {
         let selectedItem = this.selectedItem;
+        if(game.bank.getQty(this.selectedItem) <= 0) {
+            notifyPlayer(this, "You somehow don't have the item anymore.", 'danger');
+            return false;
+        }
         let selectedMod = this.menu.rerollBox.getSelectedMod();
         let modArr = [...this.selectedItem.extraModifiers];
         let modIdx = modArr.indexOf(selectedMod);
@@ -2785,6 +2840,13 @@ class Enchanting extends Skill {
         let dropQuality = Math.min(drop.quality, this.maxQuality);
         if(dropQuality > 0) {
             if(this.autoDisenchantRewards >= dropQuality) {
+                if(this.downgradeRewards) {
+                    if(this.includeCommonRewards) {
+                        this.giveAutoDisenchantRewards(item, 0);
+                        [ item, quantity ] = this.getEssenceForItem(item, 0, quantity);
+                    }
+                    return [item, quantity];
+                }
                 this.giveAutoDisenchantRewards(item, dropQuality);
                 [ item, quantity ] = this.getEssenceForItem(item, dropQuality, quantity);
             } else {
@@ -2802,6 +2864,14 @@ class Enchanting extends Skill {
         let dropQuality = Math.min(drop.quality, this.maxQuality);
         if(dropQuality > 0) {
             if(this.autoDisenchantDrops >= dropQuality) {
+                if(this.downgradeDrops) {
+                    if(this.includeCommonRewards) {
+                        this.giveAutoDisenchantRewards(item, 0);
+                        [ item, quantity ] = this.getEssenceForItem(item, 0, quantity);
+                    }
+                    return { item, quantity };
+                }
+
                 this.giveAutoDisenchantRewards(item, dropQuality);
                 [ item, quantity ] = this.getEssenceForItem(item, dropQuality, quantity);
             } else {
@@ -2821,8 +2891,7 @@ class Enchanting extends Skill {
                 id: item.id,
                 quantity: 1
             }],
-            gpCost: 0,
-            scCost: 0,
+            currencyCosts: [],
             rootItemIDs: [item.id],
             upgradedItemID: item.item.id,
             isDowngrade: true,
@@ -2960,7 +3029,7 @@ class Enchanting extends Skill {
         return true;
     }
 
-    getExistingMelcraftItem(item, quality, rolledMods, rolledSpecials) {
+    getExistingEnchantingItem(item, quality, rolledMods, rolledSpecials) {
         return this.equipment.find(equipment => {
             return  equipment.item === item &&
                     equipment.quality === quality &&
@@ -2974,7 +3043,7 @@ class Enchanting extends Skill {
             return item;
         rolledMods = this.rollMods(item, quality, rolledMods);
         rolledSpecials = this.rollSpecials(item, quality, rolledSpecials);
-        let augmentedItem = this.getExistingMelcraftItem(item, quality, rolledMods, rolledSpecials);
+        let augmentedItem = this.getExistingEnchantingItem(item, quality, rolledMods, rolledSpecials);
         if(augmentedItem === undefined) {
             augmentedItem = new EnchantingWeaponItem({item, quality, rolledMods, rolledSpecials}, this, this.game);
             this.equipment.registerObject(augmentedItem);
@@ -2989,7 +3058,7 @@ class Enchanting extends Skill {
         if(item.constructor !== EquipmentItem)
             return item;
         rolledMods = this.rollMods(item, quality, rolledMods);
-        let augmentedItem = this.getExistingMelcraftItem(item, quality, rolledMods);
+        let augmentedItem = this.getExistingEnchantingItem(item, quality, rolledMods);
         if(augmentedItem === undefined) {
             augmentedItem = new EnchantingEquipmentItem({item, quality, rolledMods}, this, this.game);
             this.equipment.registerObject(augmentedItem);
@@ -3134,8 +3203,10 @@ class Enchanting extends Skill {
             writer.writeNamespacedObject(this.selectedItem);
         writer.writeNamespacedObject(this.currentAction);
         writer.writeBoolean(this.includeCommonDrops);
+        writer.writeBoolean(this.downgradeDrops);
         writer.writeInt8(this.autoDisenchantDrops);
         writer.writeBoolean(this.includeCommonRewards);
+        writer.writeBoolean(this.downgradeRewards);
         writer.writeInt8(this.autoDisenchantRewards);
         let end = writer.byteOffset;
         console.log(`Wrote ${end-start} bytes for Enchanting save`);
@@ -3170,8 +3241,12 @@ class Enchanting extends Skill {
             }
             this.selectedAction = reader.getNamespacedObject(this.actions);
             this.includeCommonDrops = reader.getBoolean();
+            if(this.saveVersion >= 498)
+                this.downgradeDrops = reader.getBoolean();
             this.autoDisenchantDrops = reader.getInt8();
             this.includeCommonRewards = reader.getBoolean();
+            if(this.saveVersion >= 498)
+                this.downgradeRewards = reader.getBoolean();
             this.autoDisenchantRewards = reader.getInt8();
         } catch(e) { // Something's fucky, dump all progress and skip past the trash save data
             console.log(e);
